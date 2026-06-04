@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
   const supabase = createSupabaseServer()
 
-  // Upsert user by email
+  // Upsert user
   const { data: user, error: userError } = await supabase
     .from('users')
     .upsert({ email }, { onConflict: 'email' })
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: userError.message }, { status: 500 })
   }
 
-  // Mark assessment as unlocked
+  // Mark unlocked + link user
   const { error: updateError } = await supabase
     .from('assessments')
     .update({ email_unlocked: true, user_id: user.user_id })
@@ -33,5 +33,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: updateError.message }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true })
+  return NextResponse.json({ ok: true, userId: user.user_id })
 }

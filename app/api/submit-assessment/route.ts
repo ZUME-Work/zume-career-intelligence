@@ -2,7 +2,7 @@ import { createSupabaseServer } from '@/lib/supabase'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
-  const { skill, score, totalQuestions, correctCount, durationSec, responses } = await req.json()
+  const { skill, score, totalQuestions, correctCount, durationSec, responses, email } = await req.json()
 
   if (!skill || score === undefined || !totalQuestions || correctCount === undefined) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
@@ -10,7 +10,22 @@ export async function POST(req: Request) {
 
   const supabase = createSupabaseServer()
 
-  // 1. Insert assessment
+  // Check cooldown if email provided
+  if (email) {
+    const { data: cooldown } = await supabase
+      .rpc('check_assessment_cooldown', { p_email: email, p_skill: skill })
+
+    if (cooldown && !cooldown.allowed) {
+      return NextResponse.json({
+        error: 'cooldown',
+        message: `คุณได้ทำ ${skill.toUpperCase()} assessment ไปแล้วในช่วง 90 วัน`,
+        nextAvailable: cooldown.nextAvailable,
+        daysRemaining: cooldown.daysRemaining,
+      }, { status: 429 })
+    }
+  }
+
+  // Insert assessment
   const { data: assessment, error: assessmentError } = await supabase
     .from('assessments')
     .insert({
@@ -31,7 +46,7 @@ export async function POST(req: Request) {
 
   const assessmentId = assessment.assessment_id
 
-  // 2. Insert responses (if provided)
+  // Insert responses
   if (responses && responses.length > 0) {
     const responseRows = responses.map((r: any) => ({
       assessment_id: assessmentId,
@@ -40,18 +55,10 @@ export async function POST(req: Request) {
       is_correct: r.isCorrect,
       time_spent_sec: r.timeSpentSec ?? null,
     }))
-
-    const { error: responsesError } = await supabase
-      .from('responses')
-      .insert(responseRows)
-
-    if (responsesError) {
-      console.error('Responses insert error:', responsesError)
-      // ไม่ return error — assessment saved แล้ว responses ไม่ critical
-    }
+    await supabase.from('responses').insert(responseRows)
   }
 
-  // 3. Calculate percentile
+  // Calculate percentile
   const { data: percentileData } = await supabase
     .rpc('calculate_percentile', {
       p_assessment_id: assessmentId,
