@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createSupabaseBrowser } from '@/lib/supabase'
 import type { Question } from '@/lib/types'
@@ -13,6 +13,7 @@ export default function AssessmentPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [seconds, setSeconds] = useState(0)
   const [loading, setLoading] = useState(true)
+  const isSubmitting = useRef(false)
 
   useEffect(() => {
     const supabase = createSupabaseBrowser()
@@ -30,12 +31,12 @@ export default function AssessmentPage() {
   }, [skill])
 
   useEffect(() => {
-    const t = setInterval(() => setSeconds(s => s + 1), 1000)
-    return () => clearInterval(t)
+    const timer = setInterval(() => setSeconds(s => s + 1), 1000)
+    return () => clearInterval(timer)
   }, [])
 
-  const fmt = (s: number) => {
-    const m = Math.floor(s / 60).toString().padStart(2, '0')
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60)
     const sec = (s % 60).toString().padStart(2, '0')
     return `${m}:${sec}`
   }
@@ -47,7 +48,9 @@ export default function AssessmentPage() {
   }
 
   const handleNext = async () => {
-    if (!selected) return
+    if (!selected || isSubmitting.current) return
+    isSubmitting.current = true
+
     const q = questions[current]
     const newAnswers = { ...answers, [q.question_id]: selected }
     setAnswers(newAnswers)
@@ -55,109 +58,158 @@ export default function AssessmentPage() {
 
     if (current + 1 < questions.length) {
       setCurrent(current + 1)
-    } else {
-      const correct = questions.filter(
-        q => newAnswers[q.question_id] === q.correct_answer
-      ).length
-      const score = Math.round((correct / questions.length) * 100)
-      const supabase = createSupabaseBrowser()
-
-      const res = await fetch('/api/submit-assessment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          skill,
-          score,
-          totalQuestions: questions.length,
-          correctCount: correct,
-          durationSec: seconds,
-          responses: questions.map(q => ({
-            questionId: q.question_id,
-            userAnswer: newAnswers[q.question_id] ?? null,
-            isCorrect: newAnswers[q.question_id] === q.correct_answer,
-          })),
-        }),
-      })
-
-      const result = await res.json()
-      if (!res.ok) {
-        console.error('submit error:', result.error)
-        return
-      }
-      router.push(`/results/${result.assessmentId}`)
+      isSubmitting.current = false
+      return
     }
+
+    // Submit
+    const correct = questions.filter(
+      q => newAnswers[q.question_id] === q.correct_answer
+    ).length
+    const score = Math.round((correct / questions.length) * 100)
+
+    const res = await fetch('/api/submit-assessment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        skill,
+        score,
+        totalQuestions: questions.length,
+        correctCount: correct,
+        durationSec: seconds,
+        responses: questions.map(q => ({
+          questionId: q.question_id,
+          userAnswer: newAnswers[q.question_id] ?? null,
+          isCorrect: newAnswers[q.question_id] === q.correct_answer,
+        })),
+      }),
+    })
+
+    const result = await res.json()
+    if (!res.ok) {
+      console.error('submit error:', result.error)
+      isSubmitting.current = false
+      return
+    }
+    router.push(`/results/${result.assessmentId}`)
   }
 
   const handleSkip = () => {
+    if (isSubmitting.current) return
     setSelected(null)
-    if (current + 1 < questions.length) setCurrent(current + 1)
+    if (current + 1 < questions.length) {
+      setCurrent(current + 1)
+    }
   }
 
-  if (loading || questions.length === 0) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: '#888', fontSize: 14 }}>Loading questions...</p>
-    </div>
+  if (loading) return (
+    <main style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ color: '#999', fontFamily: 'system-ui' }}>Loading...</div>
+    </main>
+  )
+
+  if (!questions.length) return (
+    <main style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ color: '#999', fontFamily: 'system-ui' }}>No questions found for {skill}</div>
+    </main>
   )
 
   const q = questions[current]
-  const opts = ['A', 'B', 'C', 'D']
+  const progress = ((current) / questions.length) * 100
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F8F9FB', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px' }}>
-      <div style={{ background: '#fff', border: '0.5px solid #E0DED8', borderRadius: 14, overflow: 'hidden', width: '100%', maxWidth: 620 }}>
+    <main style={{ minHeight: '100vh', background: '#F8F9FA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui, sans-serif', padding: '1rem' }}>
+      <div style={{ width: '100%', maxWidth: 640, background: '#fff', borderRadius: 16, boxShadow: '0 2px 24px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
 
-        <div style={{ padding: '16px 24px', borderBottom: '0.5px solid #E8E6E0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 12, fontWeight: 500, color: '#1B3A5C', background: '#EEF2F7', padding: '3px 10px', borderRadius: 4 }}>
+        {/* Header */}
+        <div style={{ padding: '16px 24px', borderBottom: '0.5px solid #E8E6E0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ background: '#EEF2FF', color: '#4F46E5', fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 6 }}>
               {skillLabel[skill] ?? skill}
             </span>
-            <span style={{ fontSize: 12, color: '#999' }}>Question {current + 1} of {questions.length}</span>
+            <span style={{ fontSize: 13, color: '#666' }}>Question {current + 1} of {questions.length}</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span style={{ fontSize: 13, fontWeight: 500, color: '#666', fontFamily: 'monospace' }}>{fmt(seconds)}</span>
-          </div>
+          <span style={{ fontSize: 13, color: '#666', display: 'flex', alignItems: 'center', gap: 4 }}>
+            ⏱ {formatTime(seconds)}
+          </span>
         </div>
 
-        <div style={{ padding: '6px 24px 0', display: 'flex', gap: 3 }}>
-          {questions.map((_, i) => (
-            <div key={i} style={{ height: 3, flex: 1, background: i < current ? '#1B3A5C' : i === current ? '#1B3A5C' : '#E8E6E0', borderRadius: 2, opacity: i === current ? 0.4 : 1 }} />
-          ))}
+        {/* Progress */}
+        <div style={{ height: 3, background: '#F0F0F0' }}>
+          <div style={{ height: '100%', width: `${progress}%`, background: '#4F46E5', transition: 'width 0.3s' }} />
         </div>
 
-        <div style={{ padding: '28px 24px 20px' }}>
-          <div style={{ fontSize: 11, fontWeight: 500, letterSpacing: '.06em', textTransform: 'uppercase', color: '#aaa', marginBottom: 12 }}>
-            {q.topic.replace(/_/g, ' ')} · {q.difficulty}
+        {/* Question */}
+        <div style={{ padding: '32px 24px 24px' }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: '#999', letterSpacing: 1, marginBottom: 16, textTransform: 'uppercase' }}>
+            {q.topic} · {q.difficulty}
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 500, color: '#1A1A1A', lineHeight: 1.6, borderLeft: '3px solid #4F46E5', paddingLeft: 16, marginBottom: 24 }}>
+            {q.question_text}
           </div>
 
-          <div style={{ background: '#F7F9FC', borderLeft: '3px solid #1B3A5C', borderRadius: '0 8px 8px 0', padding: '16px 20px', marginBottom: 24 }}>
-            <div style={{ fontSize: 16, fontWeight: 500, color: '#0D1B2E', lineHeight: 1.65 }}>{q.question_text}</div>
-          </div>
-
-          {q.options.map((opt, i) => {
-            const key = opts[i]
-            const isSelected = selected === key
-            return (
-              <div key={key} onClick={() => setSelected(key)}
-                style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', border: isSelected ? '1.5px solid #1B3A5C' : '0.5px solid #E0DED8', borderRadius: 10, cursor: 'pointer', marginBottom: 10, background: isSelected ? '#F4F7FB' : '#fff' }}>
-                <div style={{ width: 28, height: 28, borderRadius: 6, border: isSelected ? 'none' : '0.5px solid #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 500, color: isSelected ? '#fff' : '#888', background: isSelected ? '#1B3A5C' : 'transparent', flexShrink: 0 }}>
-                  {key}
+          {/* Options */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {q.options.map((opt, i) => {
+              const key = ['A', 'B', 'C', 'D'][i]
+              const isSelected = selected === key
+              return (
+                <div
+                  key={key}
+                  onClick={() => setSelected(key)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 14,
+                    padding: '14px 18px',
+                    border: isSelected ? '1.5px solid #4F46E5' : '0.5px solid #E8E6E0',
+                    borderRadius: 10,
+                    cursor: 'pointer',
+                    background: isSelected ? '#EEF2FF' : '#fff',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  <div style={{
+                    width: 28, height: 28, borderRadius: 6,
+                    border: isSelected ? 'none' : '0.5px solid #ccc',
+                    background: isSelected ? '#4F46E5' : '#fff',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 12, fontWeight: 600,
+                    color: isSelected ? '#fff' : '#999',
+                    flexShrink: 0,
+                  }}>
+                    {key}
+                  </div>
+                  <div style={{ fontSize: 14, color: '#1A1A1A' }}>
+                    {opt.replace(/^[ABCD]\.\s/, '')}
+                  </div>
                 </div>
-                <div style={{ fontSize: 14, color: '#1A1A1A' }}>{opt.replace(/^[ABCD]\.\s*/, '')}</div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
 
+        {/* Footer */}
         <div style={{ padding: '16px 24px', borderTop: '0.5px solid #E8E6E0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <button onClick={handleSkip} style={{ fontSize: 13, color: '#999', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Skip</button>
-          <button onClick={handleNext} disabled={!selected}
-            style={{ fontSize: 13, fontWeight: 500, color: '#fff', background: selected ? '#1B3A5C' : '#ccc', border: 'none', borderRadius: 8, padding: '10px 28px', cursor: selected ? 'pointer' : 'not-allowed' }}>
+          <button onClick={handleSkip} style={{ fontSize: 13, color: '#999', background: 'none', border: 'none', cursor: 'pointer' }}>
+            Skip
+          </button>
+          <button
+            onClick={handleNext}
+            disabled={!selected}
+            style={{
+              fontSize: 13, fontWeight: 500,
+              color: '#fff',
+              background: selected ? '#1B3A5C' : '#ccc',
+              border: 'none',
+              borderRadius: 8,
+              padding: '8px 20px',
+              cursor: selected ? 'pointer' : 'default',
+            }}
+          >
             {current + 1 === questions.length ? 'Submit' : 'Next'}
           </button>
         </div>
 
       </div>
-    </div>
+    </main>
   )
 }
