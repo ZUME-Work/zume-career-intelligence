@@ -91,6 +91,193 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Market Intelligence */}
+<section
+  className="section-pad"
+  style={{
+    background: '#F8FAFC',
+    padding: '64px 24px',
+    borderTop: '1px solid #EEF2F7',
+    borderBottom: '1px solid #EEF2F7'
+  }}
+>
+  <div style={{ maxWidth: 860, margin: '0 auto' }}>
+    <div
+      style={{
+        textAlign: 'center',
+        marginBottom: 40
+      }}
+    >
+      <div
+        style={{
+          display: 'inline-block',
+          background: '#E0F2FE',
+          color: '#0369A1',
+          fontSize: 11,
+          fontWeight: 700,
+          padding: '6px 12px',
+          borderRadius: 20,
+          marginBottom: 12,
+          textTransform: 'uppercase',
+          letterSpacing: 1
+        }}
+      >
+        Market Intelligence
+      </div>
+
+      <h2
+        style={{
+          fontSize: 28,
+          fontWeight: 800,
+          color: '#0F172A',
+          marginBottom: 12
+        }}
+      >
+        Data Market Snapshot
+      </h2>
+
+      <p
+        style={{
+          color: '#64748B',
+          fontSize: 15,
+          lineHeight: 1.8
+        }}
+      >
+        ทักษะที่ตลาดกำลังต้องการ และเส้นทางการเติบโตในสาย Data
+      </p>
+    </div>
+
+    <div
+      className="grid-2"
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: 20
+      }}
+    >
+      <div
+        style={{
+          background: '#fff',
+          padding: 24,
+          borderRadius: 16,
+          border: '1px solid #E2E8F0'
+        }}
+      >
+        <div
+          style={{
+            fontWeight: 700,
+            fontSize: 16,
+            marginBottom: 16
+          }}
+        >
+          🔥 Most In-Demand Skills
+        </div>
+
+        {[
+          ['SQL', '91%'],
+          ['Python', '84%'],
+          ['Power BI / Tableau', '73%'],
+          ['A/B Testing', '58%'],
+          ['Data Storytelling', '55%']
+        ].map(([skill, pct]) => (
+          <div
+            key={skill}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              padding: '10px 0',
+              borderBottom: '1px solid #F1F5F9'
+            }}
+          >
+            <span>{skill}</span>
+            <strong>{pct}</strong>
+          </div>
+        ))}
+      </div>
+
+      <div
+        style={{
+          background: '#fff',
+          padding: 24,
+          borderRadius: 16,
+          border: '1px solid #E2E8F0'
+        }}
+      >
+        <div
+          style={{
+            fontWeight: 700,
+            fontSize: 16,
+            marginBottom: 16
+          }}
+        >
+          🚀 Career Progression
+        </div>
+
+        {[
+          ['Junior Analyst', '0-2 Years'],
+          ['Data Analyst', '2-4 Years'],
+          ['Senior Analyst', '4-6 Years'],
+          ['Analytics Manager', '6+ Years']
+        ].map(([role, exp]) => (
+          <div
+            key={role}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              padding: '10px 0',
+              borderBottom: '1px solid #F1F5F9'
+            }}
+          >
+            <span>{role}</span>
+            <strong>{exp}</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div
+      style={{
+        marginTop: 24,
+        background: '#0F172A',
+        color: '#fff',
+        padding: 24,
+        borderRadius: 16,
+        textAlign: 'center'
+      }}
+    >
+      <div
+        style={{
+          fontSize: 13,
+          color: '#94A3B8',
+          marginBottom: 8
+        }}
+      >
+        Coming Soon
+      </div>
+
+      <div
+        style={{
+          fontSize: 22,
+          fontWeight: 700,
+          marginBottom: 8
+        }}
+      >
+        Skill Gap Analysis
+      </div>
+
+      <div
+        style={{
+          color: '#CBD5E1',
+          fontSize: 14
+        }}
+      >
+        เปรียบเทียบผลลัพธ์ของคุณกับคนในสายงานเดียวกัน
+        และค้นหาว่าต้องพัฒนาอะไรต่อเพื่อก้าวสู่ระดับถัดไป
+      </div>
+    </div>
+  </div>
+</section>
+
         {/* Skills */}
         <section id="skills" className="section-pad" style={{ padding: '64px 24px' }}>
           <div style={{ maxWidth: 860, margin: '0 auto' }}>
