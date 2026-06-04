@@ -13,6 +13,7 @@ export default function AssessmentPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [seconds, setSeconds] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [redirecting, setRedirecting] = useState(false)
   const isSubmitting = useRef(false)
 
   useEffect(() => {
@@ -31,9 +32,10 @@ export default function AssessmentPage() {
   }, [skill])
 
   useEffect(() => {
+    if (redirecting) return
     const timer = setInterval(() => setSeconds(s => s + 1), 1000)
     return () => clearInterval(timer)
-  }, [])
+  }, [redirecting])
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60)
@@ -48,7 +50,7 @@ export default function AssessmentPage() {
   }
 
   const handleNext = async () => {
-    if (!selected || isSubmitting.current) return
+    if (!selected || isSubmitting.current || redirecting) return
     isSubmitting.current = true
 
     const q = questions[current]
@@ -62,7 +64,9 @@ export default function AssessmentPage() {
       return
     }
 
-    // Submit
+    // Final submit
+    setRedirecting(true)
+
     const correct = questions.filter(
       q => newAnswers[q.question_id] === q.correct_answer
     ).length
@@ -88,6 +92,7 @@ export default function AssessmentPage() {
     const result = await res.json()
     if (!res.ok) {
       console.error('submit error:', result.error)
+      setRedirecting(false)
       isSubmitting.current = false
       return
     }
@@ -95,7 +100,7 @@ export default function AssessmentPage() {
   }
 
   const handleSkip = () => {
-    if (isSubmitting.current) return
+    if (isSubmitting.current || redirecting) return
     setSelected(null)
     if (current + 1 < questions.length) {
       setCurrent(current + 1)
@@ -108,6 +113,14 @@ export default function AssessmentPage() {
     </main>
   )
 
+  if (redirecting) return (
+    <main style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
+      <div style={{ width: 40, height: 40, border: '3px solid #E8E6E0', borderTop: '3px solid #1B3A5C', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      <div style={{ color: '#999', fontFamily: 'system-ui', fontSize: 14 }}>Calculating your results...</div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </main>
+  )
+
   if (!questions.length) return (
     <main style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ color: '#999', fontFamily: 'system-ui' }}>No questions found for {skill}</div>
@@ -115,7 +128,7 @@ export default function AssessmentPage() {
   )
 
   const q = questions[current]
-  const progress = ((current) / questions.length) * 100
+  const progress = (current / questions.length) * 100
 
   return (
     <main style={{ minHeight: '100vh', background: '#F8F9FA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui, sans-serif', padding: '1rem' }}>
@@ -129,9 +142,7 @@ export default function AssessmentPage() {
             </span>
             <span style={{ fontSize: 13, color: '#666' }}>Question {current + 1} of {questions.length}</span>
           </div>
-          <span style={{ fontSize: 13, color: '#666', display: 'flex', alignItems: 'center', gap: 4 }}>
-            ⏱ {formatTime(seconds)}
-          </span>
+          <span style={{ fontSize: 13, color: '#666' }}>⏱ {formatTime(seconds)}</span>
         </div>
 
         {/* Progress */}
@@ -148,34 +159,13 @@ export default function AssessmentPage() {
             {q.question_text}
           </div>
 
-          {/* Options */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {q.options.map((opt, i) => {
               const key = ['A', 'B', 'C', 'D'][i]
               const isSelected = selected === key
               return (
-                <div
-                  key={key}
-                  onClick={() => setSelected(key)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 14,
-                    padding: '14px 18px',
-                    border: isSelected ? '1.5px solid #4F46E5' : '0.5px solid #E8E6E0',
-                    borderRadius: 10,
-                    cursor: 'pointer',
-                    background: isSelected ? '#EEF2FF' : '#fff',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  <div style={{
-                    width: 28, height: 28, borderRadius: 6,
-                    border: isSelected ? 'none' : '0.5px solid #ccc',
-                    background: isSelected ? '#4F46E5' : '#fff',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 12, fontWeight: 600,
-                    color: isSelected ? '#fff' : '#999',
-                    flexShrink: 0,
-                  }}>
+                <div key={key} onClick={() => setSelected(key)} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', border: isSelected ? '1.5px solid #4F46E5' : '0.5px solid #E8E6E0', borderRadius: 10, cursor: 'pointer', background: isSelected ? '#EEF2FF' : '#fff', transition: 'all 0.15s' }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 6, border: isSelected ? 'none' : '0.5px solid #ccc', background: isSelected ? '#4F46E5' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600, color: isSelected ? '#fff' : '#999', flexShrink: 0 }}>
                     {key}
                   </div>
                   <div style={{ fontSize: 14, color: '#1A1A1A' }}>
@@ -189,26 +179,17 @@ export default function AssessmentPage() {
 
         {/* Footer */}
         <div style={{ padding: '16px 24px', borderTop: '0.5px solid #E8E6E0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <button onClick={handleSkip} style={{ fontSize: 13, color: '#999', background: 'none', border: 'none', cursor: 'pointer' }}>
-            Skip
-          </button>
-          <button
-            onClick={handleNext}
-            disabled={!selected}
-            style={{
-              fontSize: 13, fontWeight: 500,
-              color: '#fff',
-              background: selected ? '#1B3A5C' : '#ccc',
-              border: 'none',
-              borderRadius: 8,
-              padding: '8px 20px',
-              cursor: selected ? 'pointer' : 'default',
-            }}
-          >
+          <button onClick={handleSkip} style={{ fontSize: 13, color: '#999', background: 'none', border: 'none', cursor: 'pointer' }}>Skip</button>
+          <button onClick={handleNext} disabled={!selected} style={{ fontSize: 13, fontWeight: 500, color: '#fff', background: selected ? '#1B3A5C' : '#ccc', border: 'none', borderRadius: 8, padding: '8px 20px', cursor: selected ? 'pointer' : 'default' }}>
             {current + 1 === questions.length ? 'Submit' : 'Next'}
           </button>
         </div>
 
+      </div>
+
+      {/* Page Footer */}
+      <div style={{ position: 'fixed', bottom: 16, left: 0, right: 0, textAlign: 'center', fontSize: '0.7rem', color: '#aaa', zIndex: 10 }}>
+        © 2026 ZUME Datalab · All rights reserved
       </div>
     </main>
   )
