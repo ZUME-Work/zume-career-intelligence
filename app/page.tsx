@@ -65,10 +65,11 @@ export default function HomePage() {
           <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, color: '#4F46E5', textTransform: 'uppercase', marginBottom: 12 }}>New Feature</div>
             <h2 style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 800, color: '#fff', marginBottom: 12 }}>
-              มาดู MBTI ฝั่ง Data กันบ้างดีกว่า
+              วิเคราะห์ Personality Type ฝั่ง Data ของคุณ
             </h2>
             <p style={{ fontSize: 15, color: '#94A3B8', marginBottom: 40, maxWidth: 480, margin: '0 auto 40px', lineHeight: 1.8 }}>
-              15 คำถาม scenario-based · ไม่มีคำตอบถูกหรือผิด<br />แค่บอกว่าคุณเป็นคนแบบไหน
+              15 คำถาม scenario-based 
+              ไม่มีคำตอบถูกหรือผิด<br />แค่บอกว่าคุณเป็นคนแบบไหน
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 12, marginBottom: 36 }}>
               {[
