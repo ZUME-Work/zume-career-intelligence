@@ -61,25 +61,29 @@ export default function AssessmentPage() {
       const score = Math.round((correct / questions.length) * 100)
       const supabase = createSupabaseBrowser()
 
-      const { data, error } = await supabase
-        .from('assessments')
-        .insert({
-          user_id: null,
+      const res = await fetch('/api/submit-assessment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           skill,
           score,
-          correct_count: correct,
-          total_questions: questions.length,
-          duration_sec: seconds,
-          email_unlocked: false,
-        })
-        .select()
-        .single()
+          totalQuestions: questions.length,
+          correctCount: correct,
+          durationSec: seconds,
+          responses: questions.map(q => ({
+            questionId: q.question_id,
+            userAnswer: newAnswers[q.question_id] ?? null,
+            isCorrect: newAnswers[q.question_id] === q.correct_answer,
+          })),
+        }),
+      })
 
-      if (error) {
-        console.error('insert error:', error)
+      const result = await res.json()
+      if (!res.ok) {
+        console.error('submit error:', result.error)
         return
       }
-      if (data) router.push(`/results/${data.assessment_id}`)
+      router.push(`/results/${result.assessmentId}`)
     }
   }
 
