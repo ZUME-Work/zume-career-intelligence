@@ -21,6 +21,7 @@ export default function AssessmentPage() {
       .select('*')
       .eq('skill', skill)
       .eq('is_active', true)
+      .order('question_id', { ascending: true })
       .limit(10)
       .then(({ data }) => {
         if (data) setQuestions(data)
@@ -45,8 +46,11 @@ export default function AssessmentPage() {
     excel: 'Excel Benchmark',
   }
 
+  const [submitting, setSubmitting] = useState(false)
+
   const handleNext = async () => {
-    if (!selected) return
+    if (!selected || submitting) return
+    setSubmitting(true)
     const q = questions[current]
     const newAnswers = { ...answers, [q.question_id]: selected }
     setAnswers(newAnswers)
@@ -84,6 +88,7 @@ export default function AssessmentPage() {
         return
       }
       router.push(`/results/${result.assessmentId}`)
+      setSubmitting(false)
     }
   }
 
