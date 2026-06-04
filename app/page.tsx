@@ -91,7 +91,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Market Intelligence */}
+        {/* Data Career Landscape */}
 <section
   className="section-pad"
   style={{
@@ -122,7 +122,7 @@ export default function HomePage() {
           letterSpacing: 1
         }}
       >
-        Market Intelligence
+        Career Intelligence
       </div>
 
       <h2
@@ -133,7 +133,7 @@ export default function HomePage() {
           marginBottom: 12
         }}
       >
-        Data Market Snapshot
+        Data Career Landscape
       </h2>
 
       <p
@@ -143,7 +143,7 @@ export default function HomePage() {
           lineHeight: 1.8
         }}
       >
-        ทักษะที่ตลาดกำลังต้องการ และเส้นทางการเติบโตในสาย Data
+        เข้าใจทักษะสำคัญ เส้นทางการเติบโต และสิ่งที่ตลาดคาดหวังจากคนสาย Data
       </p>
     </div>
 
@@ -170,27 +170,24 @@ export default function HomePage() {
             marginBottom: 16
           }}
         >
-          🔥 Most In-Demand Skills
+          🔥 Core Skills
         </div>
 
         {[
-          ['SQL', '91%'],
-          ['Python', '84%'],
-          ['Power BI / Tableau', '73%'],
-          ['A/B Testing', '58%'],
-          ['Data Storytelling', '55%']
-        ].map(([skill, pct]) => (
+          'SQL',
+          'Python',
+          'Tableau / Power BI',
+          'Experiment Design',
+          'Data Storytelling'
+        ].map((skill) => (
           <div
             key={skill}
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
               padding: '10px 0',
               borderBottom: '1px solid #F1F5F9'
             }}
           >
-            <span>{skill}</span>
-            <strong>{pct}</strong>
+            {skill}
           </div>
         ))}
       </div>
@@ -210,26 +207,24 @@ export default function HomePage() {
             marginBottom: 16
           }}
         >
-          🚀 Career Progression
+          🚀 Typical Career Path
         </div>
 
         {[
-          ['Junior Analyst', '0-2 Years'],
-          ['Data Analyst', '2-4 Years'],
-          ['Senior Analyst', '4-6 Years'],
-          ['Analytics Manager', '6+ Years']
-        ].map(([role, exp]) => (
+          'Junior Data Analyst',
+          'Data Analyst',
+          'Senior Data Analyst',
+          'Analytics Manager',
+          'Head of Analytics'
+        ].map((role) => (
           <div
             key={role}
             style={{
-              display: 'flex',
-              justifyContent: 'space-between',
               padding: '10px 0',
               borderBottom: '1px solid #F1F5F9'
             }}
           >
-            <span>{role}</span>
-            <strong>{exp}</strong>
+            {role}
           </div>
         ))}
       </div>
@@ -262,17 +257,18 @@ export default function HomePage() {
           marginBottom: 8
         }}
       >
-        Skill Gap Analysis
+        Personalized Skill Gap Analysis
       </div>
 
       <div
         style={{
           color: '#CBD5E1',
-          fontSize: 14
+          fontSize: 14,
+          lineHeight: 1.7
         }}
       >
-        เปรียบเทียบผลลัพธ์ของคุณกับคนในสายงานเดียวกัน
-        และค้นหาว่าต้องพัฒนาอะไรต่อเพื่อก้าวสู่ระดับถัดไป
+        หลังทำ Assessment คุณจะเห็นจุดแข็ง จุดอ่อน
+        และลำดับความสำคัญของทักษะที่ควรพัฒนาต่อ
       </div>
     </div>
   </div>
