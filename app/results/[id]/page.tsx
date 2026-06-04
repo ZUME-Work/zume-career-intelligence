@@ -22,56 +22,65 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
   return (
     <>
       <style>{`
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         @keyframes float {
-          0%, 100% { transform: translateY(0px) scale(1); opacity: 0.15; }
-          50% { transform: translateY(-30px) scale(1.1); opacity: 0.25; }
+          0%, 100% { transform: translateY(0px) scale(1); opacity: 0.12; }
+          50%       { transform: translateY(-28px) scale(1.08); opacity: 0.22; }
         }
-        .bubble {
-          position: absolute;
-          border-radius: 50%;
-          animation: float linear infinite;
-          pointer-events: none;
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.85); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        .bubble { position: absolute; border-radius: 50%; animation: float linear infinite; pointer-events: none; }
+        .card-in { animation: fadeUp 0.5s ease both; }
+        .circle-in { animation: scaleIn 0.6s ease both; }
+        @media (max-width: 640px) {
+          .results-inner { padding: 1.5rem 1rem !important; }
+          .score-circle { width: 130px !important; height: 130px !important; }
+          .score-num { font-size: 2rem !important; }
+          .stat-grid { gap: 0.75rem !important; }
         }
       `}</style>
 
-      <main style={{ minHeight: '100vh', background: '#0a0a0a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui,sans-serif', position: 'relative', overflow: 'hidden' }}>
+      <main style={{ minHeight: '100vh', background: '#0a0a0a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui, sans-serif', position: 'relative', overflow: 'hidden', padding: '1rem' }}>
 
         {/* Bubbles */}
         {[
-          { size: 120, left: '5%',  top: '10%', dur: '8s',  delay: '0s'   },
-          { size: 80,  left: '80%', top: '15%', dur: '11s', delay: '2s'   },
-          { size: 160, left: '60%', top: '60%', dur: '14s', delay: '1s'   },
-          { size: 60,  left: '20%', top: '70%', dur: '9s',  delay: '3s'   },
-          { size: 100, left: '40%', top: '80%', dur: '12s', delay: '0.5s' },
-          { size: 50,  left: '90%', top: '50%', dur: '7s',  delay: '4s'   },
+          { size: 120, left: '5%',  top: '8%',  dur: '8s',  delay: '0s'   },
+          { size: 80,  left: '82%', top: '12%', dur: '11s', delay: '2s'   },
+          { size: 160, left: '62%', top: '58%', dur: '14s', delay: '1s'   },
+          { size: 60,  left: '18%', top: '72%', dur: '9s',  delay: '3s'   },
+          { size: 100, left: '42%', top: '78%', dur: '12s', delay: '0.5s' },
+          { size: 50,  left: '88%', top: '48%', dur: '7s',  delay: '4s'   },
         ].map((b, i) => (
-          <div key={i} className="bubble" style={{
-            width: b.size, height: b.size,
-            left: b.left, top: b.top,
-            background: color,
-            animationDuration: b.dur,
-            animationDelay: b.delay,
-          }} />
+          <div key={i} className="bubble" style={{ width: b.size, height: b.size, left: b.left, top: b.top, background: color, animationDuration: b.dur, animationDelay: b.delay }} />
         ))}
 
-        <div style={{ textAlign: 'center', maxWidth: 480, padding: '2rem', width: '100%', position: 'relative', zIndex: 1 }}>
+        <div className="results-inner" style={{ textAlign: 'center', maxWidth: 460, width: '100%', padding: '2rem', position: 'relative', zIndex: 1 }}>
 
           {/* Score Circle */}
-          <div style={{ width: 160, height: 160, borderRadius: '50%', border: `6px solid ${color}`, margin: '0 auto 2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 40px ${color}44` }}>
-            <div style={{ fontSize: '2.5rem', fontWeight: 700, color }}>{pct}%</div>
-            <div style={{ fontSize: '0.8rem', color: '#999' }}>{assessment.correct_count}/{assessment.total_questions}</div>
+          <div className="circle-in score-circle" style={{ width: 150, height: 150, borderRadius: '50%', border: `5px solid ${color}`, margin: '0 auto 1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 48px ${color}55` }}>
+            <div className="score-num" style={{ fontSize: '2.4rem', fontWeight: 800, color, lineHeight: 1 }}>{pct}%</div>
+            <div style={{ fontSize: '0.75rem', color: '#666', marginTop: 4 }}>{assessment.correct_count}/{assessment.total_questions}</div>
           </div>
 
-          <div style={{ fontSize: '1.5rem', fontWeight: 600, color, marginBottom: '0.5rem' }}>{label}</div>
-          <div style={{ fontSize: '1rem', color: '#999', marginBottom: '2rem' }}>{skillLabel} Assessment</div>
+          {/* Label */}
+          <div className="card-in" style={{ animationDelay: '0.1s' }}>
+            <div style={{ fontSize: '1.4rem', fontWeight: 700, color, marginBottom: '0.4rem' }}>{label}</div>
+            <div style={{ fontSize: '0.9rem', color: '#888', marginBottom: '1.5rem' }}>{skillLabel} Assessment</div>
+          </div>
 
           {/* Stats */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
-            <div style={{ background: '#1a1a1a', borderRadius: 12, padding: '1rem' }}>
+          <div className="card-in stat-grid" style={{ animationDelay: '0.2s', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{ background: '#111', borderRadius: 12, padding: '1rem' }}>
               <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>{assessment.correct_count}</div>
-              <div style={{ fontSize: '0.75rem', color: '#666', marginTop: 4 }}>Correct</div>
+              <div style={{ fontSize: '0.7rem', color: '#555', marginTop: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>Correct</div>
             </div>
-            <div style={{ background: '#1a1a1a', borderRadius: 12, padding: '1rem' }}>
+            <div style={{ background: '#111', borderRadius: 12, padding: '1rem' }}>
               <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>
                 {assessment.duration_sec
                   ? assessment.duration_sec < 60
@@ -79,24 +88,47 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
                     : `${Math.round(assessment.duration_sec / 60)}m`
                   : '—'}
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#666', marginTop: 4 }}>Time</div>
+              <div style={{ fontSize: '0.7rem', color: '#555', marginTop: 4, textTransform: 'uppercase', letterSpacing: 0.5 }}>Time</div>
             </div>
           </div>
 
-          <EmailGate
-            assessmentId={id}
-            initialUnlocked={assessment.email_unlocked}
-            percentile={assessment.percentile}
-            skillLabel={skillLabel}
-          />
+          {/* Score Bar */}
+          <div className="card-in" style={{ animationDelay: '0.25s', background: '#111', borderRadius: 12, padding: '1rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#555', marginBottom: 8 }}>
+              <span>0%</span>
+              <span style={{ color: '#888' }}>Your Score</span>
+              <span>100%</span>
+            </div>
+            <div style={{ height: 8, background: '#1a1a1a', borderRadius: 4, overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 4, transition: 'width 1s ease' }} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#444', marginTop: 8 }}>
+              <span style={{ color: '#EF4444' }}>Needs Work</span>
+              <span style={{ color: '#F59E0B' }}>Good</span>
+              <span style={{ color: '#10B981' }}>Excellent</span>
+            </div>
+          </div>
 
-          <a href="/" style={{ display: 'inline-block', marginTop: '1rem', background: '#1a1a1a', color: '#999', padding: '0.75rem 2rem', borderRadius: 8, textDecoration: 'none', fontWeight: 500, fontSize: '0.85rem' }}>
-            Try Another Assessment
-          </a>
+          {/* Email Gate */}
+          <div className="card-in" style={{ animationDelay: '0.3s' }}>
+            <EmailGate
+              assessmentId={id}
+              initialUnlocked={assessment.email_unlocked}
+              percentile={assessment.percentile}
+              skillLabel={skillLabel}
+            />
+          </div>
+
+          <div className="card-in" style={{ animationDelay: '0.4s', marginTop: '1rem' }}>
+            <a href="/" style={{ display: 'inline-block', background: '#111', color: '#666', padding: '0.65rem 1.5rem', borderRadius: 8, textDecoration: 'none', fontWeight: 500, fontSize: '0.8rem', border: '1px solid #222' }}>
+              ← Try Another Skill
+            </a>
+          </div>
+
         </div>
 
         {/* Footer */}
-        <div style={{ position: 'fixed', bottom: 16, left: 0, right: 0, textAlign: 'center', fontSize: '0.7rem', color: '#444', zIndex: 10 }}>
+        <div style={{ position: 'fixed', bottom: 12, left: 0, right: 0, textAlign: 'center', fontSize: '0.65rem', color: '#333', zIndex: 10 }}>
           © 2026 ZUME Datalab · All rights reserved
         </div>
 
