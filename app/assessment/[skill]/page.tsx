@@ -45,8 +45,9 @@ export default function AssessmentPage() {
 
   const skillLabel: Record<string, string> = {
     sql: 'SQL Benchmark',
-    analytical: 'Analytical Reasoning',
+    numerical: 'Numerical Reasoning',
     excel: 'Excel Benchmark',
+    tableau: 'Tableau Benchmark',
   }
 
   const handleNext = async () => {
@@ -64,7 +65,6 @@ export default function AssessmentPage() {
       return
     }
 
-    // Final submit
     setRedirecting(true)
 
     const correct = questions.filter(
@@ -102,19 +102,17 @@ export default function AssessmentPage() {
   const handleSkip = () => {
     if (isSubmitting.current || redirecting) return
     setSelected(null)
-    if (current + 1 < questions.length) {
-      setCurrent(current + 1)
-    }
+    if (current + 1 < questions.length) setCurrent(current + 1)
   }
 
   if (loading) return (
-    <main style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <main style={{ minHeight: '100vh', background: '#F8F9FA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ color: '#999', fontFamily: 'system-ui' }}>Loading...</div>
     </main>
   )
 
   if (redirecting) return (
-    <main style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
+    <main style={{ minHeight: '100vh', background: '#F8F9FA', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
       <div style={{ width: 40, height: 40, border: '3px solid #E8E6E0', borderTop: '3px solid #1B3A5C', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
       <div style={{ color: '#999', fontFamily: 'system-ui', fontSize: 14 }}>Calculating your results...</div>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -122,7 +120,7 @@ export default function AssessmentPage() {
   )
 
   if (!questions.length) return (
-    <main style={{ minHeight: '100vh', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <main style={{ minHeight: '100vh', background: '#F8F9FA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ color: '#999', fontFamily: 'system-ui' }}>No questions found for {skill}</div>
     </main>
   )
@@ -131,66 +129,83 @@ export default function AssessmentPage() {
   const progress = (current / questions.length) * 100
 
   return (
-    <main style={{ minHeight: '100vh', background: '#F8F9FA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui, sans-serif', padding: '1rem' }}>
-      <div style={{ width: '100%', maxWidth: 640, background: '#fff', borderRadius: 16, boxShadow: '0 2px 24px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
+    <>
+      <style>{`
+        * { box-sizing: border-box; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 640px) {
+          .assessment-card { margin: 0 !important; border-radius: 0 !important; min-height: 100vh !important; box-shadow: none !important; }
+          .assessment-wrap { padding: 0 !important; align-items: flex-start !important; }
+          .q-text { font-size: 15px !important; }
+          .opt-text { font-size: 13px !important; }
+          .header-pad { padding: 12px 16px !important; }
+          .body-pad { padding: 20px 16px 16px !important; }
+          .footer-pad { padding: 12px 16px !important; }
+        }
+      `}</style>
+      <main className="assessment-wrap" style={{ minHeight: '100vh', background: '#F8F9FA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui, sans-serif', padding: '1rem' }}>
+        <div className="assessment-card" style={{ width: '100%', maxWidth: 640, background: '#fff', borderRadius: 16, boxShadow: '0 2px 24px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
 
-        {/* Header */}
-        <div style={{ padding: '16px 24px', borderBottom: '0.5px solid #E8E6E0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ background: '#EEF2FF', color: '#4F46E5', fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 6 }}>
-              {skillLabel[skill] ?? skill}
-            </span>
-            <span style={{ fontSize: 13, color: '#666' }}>Question {current + 1} of {questions.length}</span>
+          {/* Header */}
+          <div className="header-pad" style={{ padding: '16px 24px', borderBottom: '0.5px solid #E8E6E0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ background: '#EEF2FF', color: '#4F46E5', fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, whiteSpace: 'nowrap' }}>
+                {skillLabel[skill] ?? skill}
+              </span>
+              <span style={{ fontSize: 12, color: '#666' }}>Q {current + 1}/{questions.length}</span>
+            </div>
+            <span style={{ fontSize: 12, color: '#666', whiteSpace: 'nowrap' }}>⏱ {formatTime(seconds)}</span>
           </div>
-          <span style={{ fontSize: 13, color: '#666' }}>⏱ {formatTime(seconds)}</span>
-        </div>
 
-        {/* Progress */}
-        <div style={{ height: 3, background: '#F0F0F0' }}>
-          <div style={{ height: '100%', width: `${progress}%`, background: '#4F46E5', transition: 'width 0.3s' }} />
-        </div>
-
-        {/* Question */}
-        <div style={{ padding: '32px 24px 24px' }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: '#999', letterSpacing: 1, marginBottom: 16, textTransform: 'uppercase' }}>
-            {q.topic} · {q.difficulty}
-          </div>
-          <div style={{ fontSize: 16, fontWeight: 500, color: '#1A1A1A', lineHeight: 1.6, borderLeft: '3px solid #4F46E5', paddingLeft: 16, marginBottom: 24 }}>
-            {q.question_text}
+          {/* Progress */}
+          <div style={{ height: 3, background: '#F0F0F0' }}>
+            <div style={{ height: '100%', width: `${progress}%`, background: '#4F46E5', transition: 'width 0.3s' }} />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {q.options.map((opt, i) => {
-              const key = ['A', 'B', 'C', 'D'][i]
-              const isSelected = selected === key
-              return (
-                <div key={key} onClick={() => setSelected(key)} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', border: isSelected ? '1.5px solid #4F46E5' : '0.5px solid #E8E6E0', borderRadius: 10, cursor: 'pointer', background: isSelected ? '#EEF2FF' : '#fff', transition: 'all 0.15s' }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 6, border: isSelected ? 'none' : '0.5px solid #ccc', background: isSelected ? '#4F46E5' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600, color: isSelected ? '#fff' : '#999', flexShrink: 0 }}>
-                    {key}
+          {/* Question */}
+          <div className="body-pad" style={{ padding: '24px 24px 20px' }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: '#999', letterSpacing: 1, marginBottom: 12, textTransform: 'uppercase' }}>
+              {q.topic} · {q.difficulty}
+            </div>
+            <div className="q-text" style={{ fontSize: 16, fontWeight: 500, color: '#1A1A1A', lineHeight: 1.6, borderLeft: '3px solid #4F46E5', paddingLeft: 14, marginBottom: 20 }}>
+              {q.question_text}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {q.options.map((opt, i) => {
+                const key = ['A', 'B', 'C', 'D'][i]
+                const isSelected = selected === key
+                return (
+                  <div key={key} onClick={() => setSelected(key)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', border: isSelected ? '1.5px solid #4F46E5' : '0.5px solid #E8E6E0', borderRadius: 10, cursor: 'pointer', background: isSelected ? '#EEF2FF' : '#fff', transition: 'all 0.15s', WebkitTapHighlightColor: 'transparent' }}>
+                    <div style={{ width: 26, height: 26, borderRadius: 6, border: isSelected ? 'none' : '0.5px solid #ccc', background: isSelected ? '#4F46E5' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, color: isSelected ? '#fff' : '#999', flexShrink: 0 }}>
+                      {key}
+                    </div>
+                    <div className="opt-text" style={{ fontSize: 14, color: '#1A1A1A', lineHeight: 1.4 }}>
+                      {opt.replace(/^[ABCD]\.\s/, '')}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 14, color: '#1A1A1A' }}>
-                    {opt.replace(/^[ABCD]\.\s/, '')}
-                  </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
+
+          {/* Footer */}
+          <div className="footer-pad" style={{ padding: '16px 24px', borderTop: '0.5px solid #E8E6E0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <button onClick={handleSkip} style={{ fontSize: 13, color: '#999', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0' }}>
+              Skip
+            </button>
+            <button onClick={handleNext} disabled={!selected} style={{ fontSize: 13, fontWeight: 500, color: '#fff', background: selected ? '#1B3A5C' : '#ccc', border: 'none', borderRadius: 8, padding: '10px 24px', cursor: selected ? 'pointer' : 'default', minWidth: 80 }}>
+              {current + 1 === questions.length ? 'Submit' : 'Next'}
+            </button>
+          </div>
+
         </div>
 
-        {/* Footer */}
-        <div style={{ padding: '16px 24px', borderTop: '0.5px solid #E8E6E0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <button onClick={handleSkip} style={{ fontSize: 13, color: '#999', background: 'none', border: 'none', cursor: 'pointer' }}>Skip</button>
-          <button onClick={handleNext} disabled={!selected} style={{ fontSize: 13, fontWeight: 500, color: '#fff', background: selected ? '#1B3A5C' : '#ccc', border: 'none', borderRadius: 8, padding: '8px 20px', cursor: selected ? 'pointer' : 'default' }}>
-            {current + 1 === questions.length ? 'Submit' : 'Next'}
-          </button>
+        {/* Page Footer */}
+        <div style={{ position: 'fixed', bottom: 12, left: 0, right: 0, textAlign: 'center', fontSize: '0.65rem', color: '#bbb', zIndex: 10 }}>
+          © 2026 ZUME Datalab · All rights reserved
         </div>
-
-      </div>
-
-      {/* Page Footer */}
-      <div style={{ position: 'fixed', bottom: 16, left: 0, right: 0, textAlign: 'center', fontSize: '0.7rem', color: '#aaa', zIndex: 10 }}>
-        © 2026 ZUME Datalab · All rights reserved
-      </div>
-    </main>
+      </main>
+    </>
   )
 }
