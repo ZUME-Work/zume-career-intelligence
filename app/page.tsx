@@ -72,12 +72,12 @@ export default function HomePage() {
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 12, marginBottom: 36 }}>
               {[
-                { emoji: '🦊', name: 'Detective', color: '#F59E0B' },
-                { emoji: '🦅', name: 'Architect', color: '#3B82F6' },
-                { emoji: '🦋', name: 'Storyteller', color: '#EC4899' },
-                { emoji: '🦫', name: 'Engineer', color: '#10B981' },
-                { emoji: '🦉', name: 'Scientist', color: '#8B5CF6' },
-                { emoji: '🐆', name: 'Strategist', color: '#EF4444' },
+                { emoji: '🦊', name: 'Detective', color: '#F59E0B', flexWrap: 'wrap' },
+                { emoji: '🦅', name: 'Architect', color: '#3B82F6', flexWrap: 'wrap' },
+                { emoji: '🦋', name: 'Storyteller', color: '#EC4899', flexWrap: 'wrap' },
+                { emoji: '🦫', name: 'Engineer', color: '#10B981', flexWrap: 'wrap' },
+                { emoji: '🦉', name: 'Scientist', color: '#8B5CF6', flexWrap: 'wrap' },
+                { emoji: '🐆', name: 'Strategist', color: '#EF4444', flexWrap: 'wrap' },
               ].map((a) => (
                 <div key={a.name} style={{ background: '#1E293B', borderRadius: 12, padding: '16px 8px', textAlign: 'center', border: `0.5px solid ${a.color}33` }}>
                   <div style={{ fontSize: 28, marginBottom: 6 }}>{a.emoji}</div>
@@ -170,7 +170,7 @@ export default function HomePage() {
             marginBottom: 16
           }}
         >
-          🔥 Core Skills
+           Core Skills
         </div>
 
         {[
@@ -207,7 +207,7 @@ export default function HomePage() {
             marginBottom: 16
           }}
         >
-          🚀 Typical Career Path
+           Typical Career Path
         </div>
 
         {[
