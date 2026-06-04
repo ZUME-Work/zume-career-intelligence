@@ -46,11 +46,8 @@ export default function AssessmentPage() {
     excel: 'Excel Benchmark',
   }
 
-  const [submitting, setSubmitting] = useState(false)
-
   const handleNext = async () => {
-    if (!selected || submitting) return
-    setSubmitting(true)
+    if (!selected) return
     const q = questions[current]
     const newAnswers = { ...answers, [q.question_id]: selected }
     setAnswers(newAnswers)
@@ -88,7 +85,6 @@ export default function AssessmentPage() {
         return
       }
       router.push(`/results/${result.assessmentId}`)
-      setSubmitting(false)
     }
   }
 
