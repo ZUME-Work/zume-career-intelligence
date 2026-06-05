@@ -22,8 +22,7 @@ export default function HomePage() {
         .btn-ghost {
           display:inline-block; background:transparent; color:#4F46E5;
           padding:16px 40px; border-radius:14px; text-decoration:none;
-          font-size:17px; font-weight:600;
-          border:1.5px solid #C7D2FE;
+          font-size:17px; font-weight:600; border:1.5px solid #C7D2FE;
           transition:transform 0.18s, background 0.18s;
         }
         .btn-ghost:hover { transform:translateY(-3px); background:#EEF2FF; }
@@ -56,19 +55,16 @@ export default function HomePage() {
         .contact-btn:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(22,163,74,0.2); }
         @media(max-width:768px) {
           .nav-inner { padding:14px 20px !important; }
-          .hero-inner { flex-direction:column !important; gap:40px !important; padding:48px 20px 44px !important; }
-          .hero-text { max-width:100% !important; }
-          .hero-text h1 { font-size:2rem !important; }
-          .hero-text p { font-size:16px !important; }
-          .btn-row { flex-direction:column !important; }
-          .btn-main, .btn-ghost { width:100%; text-align:center; padding:15px 24px; }
-          .arch-grid { grid-template-columns:repeat(3,1fr) !important; }
           .section { padding:44px 20px !important; }
           .skill-grid { grid-template-columns:1fr 1fr !important; }
           .who-grid { grid-template-columns:1fr !important; }
+          .arch-grid { grid-template-columns:repeat(3,1fr) !important; }
+          .btn-row { flex-direction:column !important; align-items:stretch !important; width:100% !important; max-width:320px !important; }
+          .btn-main, .btn-ghost { text-align:center; }
         }
         @media(max-width:400px) {
           .arch-grid { grid-template-columns:repeat(2,1fr) !important; }
+          .skill-grid { grid-template-columns:1fr !important; }
         }
       `}</style>
 
@@ -87,68 +83,60 @@ export default function HomePage() {
           </div>
         </nav>
 
-        {/* Hero — รวมข้อความ + archetype cards */}
-        <section style={{ background:'#F9F9F9', borderBottom:'1px solid #eee' }}>
-          <div className="hero-inner" style={{ maxWidth:1100, margin:'0 auto', padding:'80px 40px 72px', display:'flex', alignItems:'center', gap:64 }}>
-
-            {/* Left */}
-            <div className="hero-text" style={{ flex:'0 0 460px', maxWidth:460 }}>
-              <div className="f1" style={{ fontSize:12, fontWeight:700, color:'#4F46E5', letterSpacing:1, textTransform:'uppercase', marginBottom:14 }}>Data Archetype</div>
-              <h1 className="f2" style={{ fontSize:'clamp(2rem,4vw,2.8rem)', fontWeight:800, color:'#111', lineHeight:1.2, marginBottom:18, letterSpacing:'-0.4px' }}>
-                คุณเป็นคนทำงาน<br />ด้าน Data สายไหน?
-              </h1>
-              <p className="f3" style={{ fontSize:17, color:'#666', lineHeight:1.8, marginBottom:32 }}>
-                ตอบ 15 คำถามสั้นๆ แล้วรู้เลยว่าคุณถนัดด้านไหน จุดแข็งคืออะไร และควรพัฒนาต่อยังไง
-              </p>
-              <div className="f4 btn-row" style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
-                <Link href="/archetype" className="btn-main">ค้นหาสไตล์ของฉัน →</Link>
-                <Link href="#skills" className="btn-ghost">ทดสอบทักษะ</Link>
-              </div>
-              <p style={{ fontSize:13, color:'#ccc', marginTop:14 }}>ฟรี · ไม่ต้องสมัครสมาชิก</p>
+        {/* Hero */}
+        <section className="section" style={{ background:'#F9F9F9', padding:'80px 40px 72px', textAlign:'center', borderBottom:'1px solid #eee' }}>
+          <div style={{ maxWidth:600, margin:'0 auto' }}>
+            <div className="f1" style={{ fontSize:12, fontWeight:700, color:'#4F46E5', letterSpacing:1, textTransform:'uppercase', marginBottom:14 }}>Data Archetype</div>
+            <h1 className="f2" style={{ fontSize:'clamp(2rem,4vw,2.8rem)', fontWeight:800, color:'#111', lineHeight:1.2, marginBottom:18, letterSpacing:'-0.4px' }}>
+              คุณเป็นคนทำงาน<br />ด้าน Data สายไหน?
+            </h1>
+            <p className="f3" style={{ fontSize:17, color:'#666', lineHeight:1.8, marginBottom:36 }}>
+              ตอบ 15 คำถามสั้นๆ แล้วรู้เลยว่าคุณถนัดด้านไหน<br />จุดแข็งคืออะไร และควรพัฒนาต่อยังไง
+            </p>
+            <div className="f4 btn-row" style={{ display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap' }}>
+              <Link href="/archetype" className="btn-main">ค้นหาสไตล์ของฉัน →</Link>
+              <Link href="#skills" className="btn-ghost">ทดสอบทักษะ</Link>
             </div>
+            <p style={{ fontSize:13, color:'#ccc', marginTop:16 }}>ฟรี · ไม่ต้องสมัครสมาชิก</p>
+          </div>
+        </section>
 
-            {/* Right — archetype cards */}
-            <div style={{ flex:1 }}>
-              <div className="arch-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12 }}>
-                {[
-                  { emoji:'🦊', name:'นักสืบข้อมูล',   bg:'#FEF9EE', border:'#F59E0B', delay:'0s'   },
-                  { emoji:'🦅', name:'นักออกแบบระบบ', bg:'#EFF6FF', border:'#3B82F6', delay:'0.5s' },
-                  { emoji:'🦋', name:'นักเล่าเรื่อง',   bg:'#FDF2F8', border:'#EC4899', delay:'1s'   },
-                  { emoji:'🦫', name:'นักสร้าง',        bg:'#F0FDF4', border:'#10B981', delay:'1.5s' },
-                  { emoji:'🦉', name:'นักทดสอบ',        bg:'#F5F3FF', border:'#8B5CF6', delay:'2s'   },
-                  { emoji:'🐆', name:'นักกลยุทธ์',      bg:'#FFF1F2', border:'#EF4444', delay:'2.5s' },
-                ].map((a) => (
-                  <div key={a.name} className="arch-pill" style={{ background:a.bg, border:`1px solid ${a.border}33`, animationDuration:'3.5s', animationDelay:a.delay }}>
-                    <div style={{ fontSize:30, marginBottom:8 }}>{a.emoji}</div>
-                    <div style={{ fontSize:12, color:'#444', fontWeight:600, lineHeight:1.4 }}>{a.name}</div>
-                  </div>
-                ))}
-              </div>
+        {/* Archetype cards */}
+        <section className="section" style={{ padding:'64px 40px' }}>
+          <div style={{ maxWidth:700, margin:'0 auto', textAlign:'center' }}>
+            <p style={{ fontSize:15, color:'#999', marginBottom:32 }}>6 สไตล์การทำงาน คุณเป็นแบบไหน?</p>
+            <div className="arch-grid" style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:12 }}>
+              {[
+                { emoji:'🦊', name:'นักสืบข้อมูล',   bg:'#FEF9EE', border:'#F59E0B', delay:'0s'   },
+                { emoji:'🦅', name:'นักออกแบบระบบ', bg:'#EFF6FF', border:'#3B82F6', delay:'0.5s' },
+                { emoji:'🦋', name:'นักเล่าเรื่อง',   bg:'#FDF2F8', border:'#EC4899', delay:'1s'   },
+                { emoji:'🦫', name:'นักสร้าง',        bg:'#F0FDF4', border:'#10B981', delay:'1.5s' },
+                { emoji:'🦉', name:'นักทดสอบ',        bg:'#F5F3FF', border:'#8B5CF6', delay:'2s'   },
+                { emoji:'🐆', name:'นักกลยุทธ์',      bg:'#FFF1F2', border:'#EF4444', delay:'2.5s' },
+              ].map((a) => (
+                <div key={a.name} className="arch-pill" style={{ background:a.bg, border:`1px solid ${a.border}33`, animationDuration:'3.5s', animationDelay:a.delay }}>
+                  <div style={{ fontSize:28, marginBottom:8 }}>{a.emoji}</div>
+                  <div style={{ fontSize:11, color:'#444', fontWeight:600, lineHeight:1.4 }}>{a.name}</div>
+                </div>
+              ))}
             </div>
-
           </div>
         </section>
 
         {/* Skills */}
-        <section id="skills" className="section" style={{ padding:'64px 40px' }}>
-          <div style={{ maxWidth:1100, margin:'0 auto' }}>
-            <div style={{ marginBottom:36 }}>
-              <div style={{ fontSize:12, fontWeight:700, color:'#4F46E5', letterSpacing:1, textTransform:'uppercase', marginBottom:12 }}>ทดสอบทักษะ</div>
-              <h2 style={{ fontSize:'clamp(1.5rem,3vw,1.9rem)', fontWeight:800, color:'#111', marginBottom:12, lineHeight:1.3 }}>
-                รู้ว่าตัวเองเก่งแค่ไหน
-              </h2>
-              <p style={{ fontSize:16, color:'#666', lineHeight:1.8 }}>
-                ทำข้อสอบ 10 ข้อ แล้วดูว่าอยู่ Top กี่ % เมื่อเทียบกับคนอื่น
-              </p>
-            </div>
+        <section id="skills" className="section" style={{ background:'#F9F9F9', padding:'64px 40px' }}>
+          <div style={{ maxWidth:900, margin:'0 auto', textAlign:'center' }}>
+            <div style={{ fontSize:12, fontWeight:700, color:'#4F46E5', letterSpacing:1, textTransform:'uppercase', marginBottom:12 }}>ทดสอบทักษะ</div>
+            <h2 style={{ fontSize:'clamp(1.5rem,3vw,1.9rem)', fontWeight:800, color:'#111', marginBottom:12, lineHeight:1.3 }}>รู้ว่าตัวเองเก่งแค่ไหน</h2>
+            <p style={{ fontSize:16, color:'#666', lineHeight:1.8, marginBottom:36 }}>ทำข้อสอบ 10 ข้อ แล้วดูว่าอยู่ Top กี่ % เมื่อเทียบกับคนอื่น</p>
             <div className="skill-grid" style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:14 }}>
               {[
-                { skill:'sql',       icon:'🗄️', label:'SQL',    desc:'การดึงและจัดการข้อมูล',       bg:'#EEF2FF', accent:'#4F46E5' },
-                { skill:'excel',     icon:'📊', label:'Excel',  desc:'สูตร ตาราง และการวิเคราะห์',  bg:'#F0FDF4', accent:'#16A34A' },
-                { skill:'tableau',   icon:'📈', label:'Tableau', desc:'การสร้างกราฟและแดชบอร์ด',    bg:'#FFF7ED', accent:'#EA580C' },
-                { skill:'numerical', icon:'🧮', label:'ตัวเลข', desc:'เปอร์เซ็นต์ อัตราส่วน การคำนวณ', bg:'#FDF4FF', accent:'#9333EA' },
+                { skill:'sql',       icon:'🗄️', label:'SQL',    desc:'การดึงและจัดการข้อมูล',            bg:'#EEF2FF', accent:'#4F46E5' },
+                { skill:'excel',     icon:'📊', label:'Excel',  desc:'สูตร ตาราง และการวิเคราะห์',       bg:'#F0FDF4', accent:'#16A34A' },
+                { skill:'tableau',   icon:'📈', label:'Tableau', desc:'การสร้างกราฟและแดชบอร์ด',         bg:'#FFF7ED', accent:'#EA580C' },
+                { skill:'numerical', icon:'🧮', label:'ตัวเลข', desc:'เปอร์เซ็นต์ อัตราส่วน การคำนวณ',  bg:'#FDF4FF', accent:'#9333EA' },
               ].map((s) => (
-                <Link key={s.skill} href={'/assessment/'+s.skill} className="skill-card" style={{ background:s.bg, border:`1px solid ${s.accent}22` }}>
+                <Link key={s.skill} href={'/assessment/'+s.skill} className="skill-card" style={{ background:s.bg, border:`1px solid ${s.accent}22`, textAlign:'left' }}>
                   <div style={{ fontSize:28, marginBottom:10 }}>{s.icon}</div>
                   <div style={{ fontSize:16, fontWeight:700, color:'#111', marginBottom:6 }}>{s.label}</div>
                   <div style={{ fontSize:13, color:'#666', lineHeight:1.5 }}>{s.desc}</div>
@@ -160,16 +148,16 @@ export default function HomePage() {
         </section>
 
         {/* For who */}
-        <section className="section" style={{ background:'#F9F9F9', padding:'64px 40px' }}>
-          <div style={{ maxWidth:1100, margin:'0 auto' }}>
-            <h2 style={{ fontSize:'clamp(1.5rem,3vw,1.9rem)', fontWeight:800, color:'#111', marginBottom:36, textAlign:'center' }}>เหมาะกับใครบ้าง?</h2>
+        <section className="section" style={{ padding:'64px 40px' }}>
+          <div style={{ maxWidth:900, margin:'0 auto', textAlign:'center' }}>
+            <h2 style={{ fontSize:'clamp(1.5rem,3vw,1.9rem)', fontWeight:800, color:'#111', marginBottom:36 }}>เหมาะกับใครบ้าง?</h2>
             <div className="who-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
               {[
-                { icon:'🎓', title:'นักเรียน นักศึกษา',     desc:'เตรียมตัวหางานในสาย Data รู้ว่าต้องฝึกอะไรก่อน' },
-                { icon:'🔄', title:'คนที่อยากเปลี่ยนสาย',  desc:'เช็คว่าตัวเองพร้อมแค่ไหน และยังขาดทักษะด้านไหน' },
-                { icon:'💼', title:'คนทำงาน Data อยู่แล้ว', desc:'วัดว่าตัวเองอยู่ระดับไหนเมื่อเทียบกับคนอื่น' },
+                { icon:'🎓', title:'นักเรียน นักศึกษา',      desc:'เตรียมตัวหางานในสาย Data รู้ว่าต้องฝึกอะไรก่อน' },
+                { icon:'🔄', title:'คนที่อยากเปลี่ยนสาย',   desc:'เช็คว่าตัวเองพร้อมแค่ไหน และยังขาดทักษะด้านไหน' },
+                { icon:'💼', title:'คนทำงาน Data อยู่แล้ว',  desc:'วัดว่าตัวเองอยู่ระดับไหนเมื่อเทียบกับคนอื่น' },
               ].map((c,i) => (
-                <div key={i} className="who-card">
+                <div key={i} className="who-card" style={{ textAlign:'left' }}>
                   <div style={{ fontSize:32, marginBottom:14 }}>{c.icon}</div>
                   <div style={{ fontSize:17, fontWeight:700, color:'#111', marginBottom:10 }}>{c.title}</div>
                   <div style={{ fontSize:15, color:'#666', lineHeight:1.7 }}>{c.desc}</div>
