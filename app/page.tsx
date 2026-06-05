@@ -5,66 +5,59 @@ export default function HomePage() {
     <>
       <style>{`
         * { box-sizing:border-box; margin:0; padding:0; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
         .f1{animation:fadeUp 0.5s ease both}
         .f2{animation:fadeUp 0.5s 0.1s ease both}
         .f3{animation:fadeUp 0.5s 0.2s ease both}
         .f4{animation:fadeUp 0.5s 0.3s ease both}
         .btn-main {
-          display:inline-block; background:#4F46E5; color:#fff;
-          padding:16px 40px; border-radius:14px; text-decoration:none;
+          display:block; background:#4F46E5; color:#fff; text-align:center;
+          padding:17px 24px; border-radius:14px; text-decoration:none;
           font-size:17px; font-weight:700;
           box-shadow:0 4px 20px rgba(79,70,229,0.3);
           transition:transform 0.18s, box-shadow 0.18s;
         }
         .btn-main:hover { transform:translateY(-3px); box-shadow:0 10px 32px rgba(79,70,229,0.4); }
         .btn-ghost {
-          display:inline-block; background:transparent; color:#4F46E5;
-          padding:16px 40px; border-radius:14px; text-decoration:none;
+          display:block; background:#fff; color:#4F46E5; text-align:center;
+          padding:17px 24px; border-radius:14px; text-decoration:none;
           font-size:17px; font-weight:600; border:1.5px solid #C7D2FE;
           transition:transform 0.18s, background 0.18s;
         }
         .btn-ghost:hover { transform:translateY(-3px); background:#EEF2FF; }
         .skill-card {
-          display:block; text-decoration:none; border-radius:16px; padding:22px 18px;
+          display:block; text-decoration:none; border-radius:16px; padding:20px 16px;
           box-shadow:0 1px 6px rgba(0,0,0,0.06);
           transition:transform 0.2s, box-shadow 0.2s;
         }
-        .skill-card:hover { transform:translateY(-5px); box-shadow:0 12px 28px rgba(0,0,0,0.1); }
-        .arch-pill {
-          border-radius:12px; padding:16px 10px; text-align:center;
-          box-shadow:0 1px 4px rgba(0,0,0,0.05);
-          transition:transform 0.2s, box-shadow 0.2s;
-          animation:float ease-in-out infinite;
-        }
-        .arch-pill:hover { transform:translateY(-5px) !important; box-shadow:0 10px 20px rgba(0,0,0,0.1); animation:none; }
+        .skill-card:hover { transform:translateY(-4px); box-shadow:0 12px 28px rgba(0,0,0,0.1); }
         .who-card {
-          background:#fff; border-radius:16px; padding:26px 20px;
+          background:#fff; border-radius:16px; padding:24px 20px;
           border:1px solid #eee; box-shadow:0 1px 4px rgba(0,0,0,0.04);
           transition:transform 0.2s, box-shadow 0.2s;
         }
-        .who-card:hover { transform:translateY(-4px); box-shadow:0 10px 24px rgba(0,0,0,0.08); }
+        .who-card:hover { transform:translateY(-3px); box-shadow:0 10px 24px rgba(0,0,0,0.08); }
         .contact-btn {
-          display:flex; align-items:center; gap:8px;
+          display:flex; align-items:center; gap:7px;
           background:#F0FDF4; color:#16A34A;
-          padding:8px 16px; border-radius:20px; text-decoration:none;
+          padding:8px 14px; border-radius:20px; text-decoration:none;
           font-size:13px; font-weight:600; border:1px solid #BBF7D0;
-          transition:transform 0.15s, box-shadow 0.15s;
+          transition:transform 0.15s; white-space:nowrap;
         }
-        .contact-btn:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(22,163,74,0.2); }
-        @media(max-width:768px) {
-          .nav-inner { padding:14px 20px !important; }
-          .section { padding:44px 20px !important; }
-          .skill-grid { grid-template-columns:1fr 1fr !important; }
-          .who-grid { grid-template-columns:1fr !important; }
-          .arch-grid { grid-template-columns:repeat(3,1fr) !important; }
-          .btn-row { flex-direction:column !important; align-items:stretch !important; width:100% !important; max-width:320px !important; }
-          .btn-main, .btn-ghost { text-align:center; }
+        .contact-btn:hover { transform:translateY(-1px); }
+        .wrap { width:100%; max-width:480px; margin:0 auto; padding:0 20px; }
+        .section { padding:48px 0; }
+        .skill-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .who-grid { display:grid; grid-template-columns:1fr; gap:14px; }
+        @media(min-width:640px) {
+          .wrap { max-width:600px; padding:0 32px; }
+          .section { padding:64px 0; }
+          .who-grid { grid-template-columns:repeat(3,1fr); }
         }
-        @media(max-width:400px) {
-          .arch-grid { grid-template-columns:repeat(2,1fr) !important; }
-          .skill-grid { grid-template-columns:1fr !important; }
+        @media(min-width:960px) {
+          .wrap { max-width:880px; }
+          .skill-grid { grid-template-columns:repeat(4,1fr); gap:16px; }
         }
       `}</style>
 
@@ -72,75 +65,54 @@ export default function HomePage() {
 
         {/* Nav */}
         <nav style={{ borderBottom:'1px solid #f0f0f0', position:'sticky', top:0, background:'rgba(255,255,255,0.96)', backdropFilter:'blur(8px)', zIndex:100 }}>
-          <div className="nav-inner" style={{ maxWidth:1100, margin:'0 auto', padding:'14px 40px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <div style={{ maxWidth:880, margin:'0 auto', padding:'14px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
             <div style={{ fontWeight:800, fontSize:17, color:'#111' }}>
               ZUME <span style={{ color:'#4F46E5', fontWeight:500 }}>Datalab</span>
             </div>
             <a href="https://www.facebook.com/profile.php?id=61581811456373" target="_blank" rel="noopener noreferrer" className="contact-btn">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
               ติดต่อเรา
             </a>
           </div>
         </nav>
 
         {/* Hero */}
-        <section className="section" style={{ background:'#F9F9F9', padding:'80px 40px 72px', textAlign:'center', borderBottom:'1px solid #eee' }}>
-          <div style={{ maxWidth:600, margin:'0 auto' }}>
-            <div className="f1" style={{ fontSize:12, fontWeight:700, color:'#4F46E5', letterSpacing:1, textTransform:'uppercase', marginBottom:14 }}>Data Archetype</div>
-            <h1 className="f2" style={{ fontSize:'clamp(2rem,4vw,2.8rem)', fontWeight:800, color:'#111', lineHeight:1.2, marginBottom:18, letterSpacing:'-0.4px' }}>
+        <section style={{ background:'#F9F9F9', borderBottom:'1px solid #eee' }}>
+          <div className="wrap section" style={{ textAlign:'center' }}>
+            <div className="f1" style={{ fontSize:11, fontWeight:700, color:'#4F46E5', letterSpacing:1.5, textTransform:'uppercase', marginBottom:16 }}>ZUME Datalab</div>
+            <h1 className="f2" style={{ fontSize:'clamp(1.9rem,6vw,2.8rem)', fontWeight:800, color:'#111', lineHeight:1.2, marginBottom:16, letterSpacing:'-0.3px' }}>
               คุณเป็นคนทำงาน<br />ด้าน Data สายไหน?
             </h1>
-            <p className="f3" style={{ fontSize:17, color:'#666', lineHeight:1.8, marginBottom:36 }}>
-              ตอบ 15 คำถามสั้นๆ แล้วรู้เลยว่าคุณถนัดด้านไหน<br />จุดแข็งคืออะไร และควรพัฒนาต่อยังไง
+            <p className="f3" style={{ fontSize:17, color:'#666', lineHeight:1.8, marginBottom:32 }}>
+              ตอบ 15 คำถามสั้นๆ<br />รู้เลยว่าถนัดด้านไหน และควรพัฒนาต่อยังไง
             </p>
-            <div className="f4 btn-row" style={{ display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap' }}>
+            <div className="f4" style={{ display:'flex', flexDirection:'column', gap:12, maxWidth:320, margin:'0 auto 20px' }}>
               <Link href="/archetype" className="btn-main">ค้นหาสไตล์ของฉัน →</Link>
               <Link href="#skills" className="btn-ghost">ทดสอบทักษะ</Link>
             </div>
-            <p style={{ fontSize:13, color:'#ccc', marginTop:16 }}>ฟรี · ไม่ต้องสมัครสมาชิก</p>
-          </div>
-        </section>
-
-        {/* Archetype cards */}
-        <section className="section" style={{ padding:'64px 40px' }}>
-          <div style={{ maxWidth:700, margin:'0 auto', textAlign:'center' }}>
-            <p style={{ fontSize:15, color:'#999', marginBottom:32 }}>6 สไตล์การทำงาน คุณเป็นแบบไหน?</p>
-            <div className="arch-grid" style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:12 }}>
-              {[
-                { emoji:'🦊', name:'นักสืบข้อมูล',   bg:'#FEF9EE', border:'#F59E0B', delay:'0s'   },
-                { emoji:'🦅', name:'นักออกแบบระบบ', bg:'#EFF6FF', border:'#3B82F6', delay:'0.5s' },
-                { emoji:'🦋', name:'นักเล่าเรื่อง',   bg:'#FDF2F8', border:'#EC4899', delay:'1s'   },
-                { emoji:'🦫', name:'นักสร้าง',        bg:'#F0FDF4', border:'#10B981', delay:'1.5s' },
-                { emoji:'🦉', name:'นักทดสอบ',        bg:'#F5F3FF', border:'#8B5CF6', delay:'2s'   },
-                { emoji:'🐆', name:'นักกลยุทธ์',      bg:'#FFF1F2', border:'#EF4444', delay:'2.5s' },
-              ].map((a) => (
-                <div key={a.name} className="arch-pill" style={{ background:a.bg, border:`1px solid ${a.border}33`, animationDuration:'3.5s', animationDelay:a.delay }}>
-                  <div style={{ fontSize:28, marginBottom:8 }}>{a.emoji}</div>
-                  <div style={{ fontSize:11, color:'#444', fontWeight:600, lineHeight:1.4 }}>{a.name}</div>
-                </div>
-              ))}
-            </div>
+            <p style={{ fontSize:13, color:'#ccc' }}>ฟรี · ไม่ต้องสมัครสมาชิก</p>
           </div>
         </section>
 
         {/* Skills */}
-        <section id="skills" className="section" style={{ background:'#F9F9F9', padding:'64px 40px' }}>
-          <div style={{ maxWidth:900, margin:'0 auto', textAlign:'center' }}>
-            <div style={{ fontSize:12, fontWeight:700, color:'#4F46E5', letterSpacing:1, textTransform:'uppercase', marginBottom:12 }}>ทดสอบทักษะ</div>
-            <h2 style={{ fontSize:'clamp(1.5rem,3vw,1.9rem)', fontWeight:800, color:'#111', marginBottom:12, lineHeight:1.3 }}>รู้ว่าตัวเองเก่งแค่ไหน</h2>
-            <p style={{ fontSize:16, color:'#666', lineHeight:1.8, marginBottom:36 }}>ทำข้อสอบ 10 ข้อ แล้วดูว่าอยู่ Top กี่ % เมื่อเทียบกับคนอื่น</p>
-            <div className="skill-grid" style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:14 }}>
+        <section id="skills" style={{ borderBottom:'1px solid #eee' }}>
+          <div className="wrap section">
+            <div style={{ marginBottom:28, textAlign:'center' }}>
+              <h2 style={{ fontSize:'clamp(1.4rem,5vw,1.8rem)', fontWeight:800, color:'#111', marginBottom:10 }}>ทดสอบทักษะ</h2>
+              <p style={{ fontSize:15, color:'#666', lineHeight:1.7 }}>ข้อสอบ 10 ข้อ ดูได้เลยว่าอยู่ Top กี่ %</p>
+            </div>
+            <div className="skill-grid">
               {[
-                { skill:'sql',       icon:'🗄️', label:'SQL',    desc:'การดึงและจัดการข้อมูล',            bg:'#EEF2FF', accent:'#4F46E5' },
-                { skill:'excel',     icon:'📊', label:'Excel',  desc:'สูตร ตาราง และการวิเคราะห์',       bg:'#F0FDF4', accent:'#16A34A' },
-                { skill:'tableau',   icon:'📈', label:'Tableau', desc:'การสร้างกราฟและแดชบอร์ด',         bg:'#FFF7ED', accent:'#EA580C' },
-                { skill:'numerical', icon:'🧮', label:'ตัวเลข', desc:'เปอร์เซ็นต์ อัตราส่วน การคำนวณ',  bg:'#FDF4FF', accent:'#9333EA' },
+                { skill:'sql',       icon:'🗄️', label:'SQL',    desc:'ดึงและจัดการข้อมูล',     bg:'#EEF2FF', accent:'#4F46E5' },
+                { skill:'excel',     icon:'📊', label:'Excel',  desc:'สูตร ตาราง วิเคราะห์',   bg:'#F0FDF4', accent:'#16A34A' },
+                { skill:'tableau',   icon:'📈', label:'Tableau', desc:'กราฟและแดชบอร์ด',       bg:'#FFF7ED', accent:'#EA580C' },
+                { skill:'numerical', icon:'🧮', label:'ตัวเลข', desc:'เปอร์เซ็นต์ อัตราส่วน', bg:'#FDF4FF', accent:'#9333EA' },
               ].map((s) => (
-                <Link key={s.skill} href={'/assessment/'+s.skill} className="skill-card" style={{ background:s.bg, border:`1px solid ${s.accent}22`, textAlign:'left' }}>
-                  <div style={{ fontSize:28, marginBottom:10 }}>{s.icon}</div>
-                  <div style={{ fontSize:16, fontWeight:700, color:'#111', marginBottom:6 }}>{s.label}</div>
-                  <div style={{ fontSize:13, color:'#666', lineHeight:1.5 }}>{s.desc}</div>
-                  <div style={{ marginTop:14, fontSize:13, fontWeight:600, color:s.accent }}>เริ่มทดสอบ →</div>
+                <Link key={s.skill} href={'/assessment/'+s.skill} className="skill-card" style={{ background:s.bg, border:`1px solid ${s.accent}22` }}>
+                  <div style={{ fontSize:26, marginBottom:10 }}>{s.icon}</div>
+                  <div style={{ fontSize:15, fontWeight:700, color:'#111', marginBottom:4 }}>{s.label}</div>
+                  <div style={{ fontSize:12, color:'#666', lineHeight:1.5, marginBottom:12 }}>{s.desc}</div>
+                  <div style={{ fontSize:13, fontWeight:600, color:s.accent }}>เริ่มทดสอบ →</div>
                 </Link>
               ))}
             </div>
@@ -148,27 +120,27 @@ export default function HomePage() {
         </section>
 
         {/* For who */}
-        <section className="section" style={{ padding:'64px 40px' }}>
-          <div style={{ maxWidth:900, margin:'0 auto', textAlign:'center' }}>
-            <h2 style={{ fontSize:'clamp(1.5rem,3vw,1.9rem)', fontWeight:800, color:'#111', marginBottom:36 }}>เหมาะกับใครบ้าง?</h2>
-            <div className="who-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
+        <section style={{ background:'#F9F9F9' }}>
+          <div className="wrap section">
+            <h2 style={{ fontSize:'clamp(1.4rem,5vw,1.8rem)', fontWeight:800, color:'#111', marginBottom:28, textAlign:'center' }}>เหมาะกับใครบ้าง?</h2>
+            <div className="who-grid">
               {[
-                { icon:'🎓', title:'นักเรียน นักศึกษา',      desc:'เตรียมตัวหางานในสาย Data รู้ว่าต้องฝึกอะไรก่อน' },
-                { icon:'🔄', title:'คนที่อยากเปลี่ยนสาย',   desc:'เช็คว่าตัวเองพร้อมแค่ไหน และยังขาดทักษะด้านไหน' },
-                { icon:'💼', title:'คนทำงาน Data อยู่แล้ว',  desc:'วัดว่าตัวเองอยู่ระดับไหนเมื่อเทียบกับคนอื่น' },
+                { icon:'🎓', title:'นักเรียน นักศึกษา',     desc:'เตรียมตัวหางานในสาย Data รู้ว่าต้องฝึกอะไรก่อน' },
+                { icon:'🔄', title:'คนที่อยากเปลี่ยนสาย',  desc:'เช็คว่าพร้อมแค่ไหน และยังขาดทักษะด้านไหน' },
+                { icon:'💼', title:'คนทำงาน Data อยู่แล้ว', desc:'วัดว่าตัวเองอยู่ระดับไหนเมื่อเทียบกับคนอื่น' },
               ].map((c,i) => (
-                <div key={i} className="who-card" style={{ textAlign:'left' }}>
-                  <div style={{ fontSize:32, marginBottom:14 }}>{c.icon}</div>
-                  <div style={{ fontSize:17, fontWeight:700, color:'#111', marginBottom:10 }}>{c.title}</div>
-                  <div style={{ fontSize:15, color:'#666', lineHeight:1.7 }}>{c.desc}</div>
+                <div key={i} className="who-card">
+                  <div style={{ fontSize:30, marginBottom:12 }}>{c.icon}</div>
+                  <div style={{ fontSize:16, fontWeight:700, color:'#111', marginBottom:8 }}>{c.title}</div>
+                  <div style={{ fontSize:14, color:'#666', lineHeight:1.7 }}>{c.desc}</div>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <footer style={{ padding:'24px 40px', textAlign:'center', background:'#111' }}>
-          <div style={{ fontSize:13, color:'#444' }}>© 2026 ZUME Datalab · All rights reserved</div>
+        <footer style={{ padding:'20px', textAlign:'center', background:'#111' }}>
+          <div style={{ fontSize:12, color:'#444' }}>© 2026 ZUME Datalab · All rights reserved</div>
         </footer>
 
       </main>
