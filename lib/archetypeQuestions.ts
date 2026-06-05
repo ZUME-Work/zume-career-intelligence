@@ -28,7 +28,7 @@ export const archetypeQuestions: ArchetypeQuestion[] = [
     emoji: '📦',
     options: [
       { text: '🧹 เช็ค data quality, null values, outliers', scores: { scientist: 3, engineer: 1 } },
-      { text: '🗺️ วางแผก structure และ schema ให้ชัดเจนก่อน', scores: { architect: 3, engineer: 1 } },
+      { text: '🗺️ วางแผน structure และ schema ให้ชัดเจนก่อน', scores: { architect: 3, engineer: 1 } },
       { text: '💡 หา pattern ที่น่าสนใจและ insight ที่ซ่อนอยู่', scores: { detective: 3, storyteller: 1 } },
       { text: '📈 คิดว่าจะเอา data นี้ไป answer business question อะไรได้บ้าง', scores: { strategist: 3, storyteller: 1 } },
     ],
