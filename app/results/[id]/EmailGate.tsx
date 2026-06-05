@@ -28,6 +28,8 @@ export default function EmailGate({ assessmentId, initialUnlocked, percentile, s
   const [step, setStep] = useState<Step>(initialUnlocked ? 'unlocked' : 'locked')
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
+  const [consent, setConsent] = useState(false)
+  const [consentError, setConsentError] = useState(false)
   const [roleCurrentVal, setRoleCurrentVal] = useState('')
   const [roleCurrentOther, setRoleCurrentOther] = useState('')
   const [targetRoleVal, setTargetRoleVal] = useState('')
@@ -37,17 +39,17 @@ export default function EmailGate({ assessmentId, initialUnlocked, percentile, s
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleEmailChange = (val: string) => {
-    setEmail(val)
-    if (emailError) setEmailError('')
-  }
-
   const handleEmailSubmit = async () => {
-    if (!email.trim()) { setEmailError('กรุณากรอกอีเมลก่อนนะ'); return }
-    if (!isValidEmail(email)) { setEmailError('อีเมลไม่ถูกต้อง เช่น name@email.com'); return }
+    let hasError = false
+    if (!email.trim()) { setEmailError('กรุณากรอกอีเมลก่อนนะ'); hasError = true }
+    else if (!isValidEmail(email)) { setEmailError('อีเมลไม่ถูกต้อง เช่น name@email.com'); hasError = true }
+    else setEmailError('')
+    if (!consent) { setConsentError(true); hasError = true }
+    else setConsentError(false)
+    if (hasError) return
+
     setLoading(true)
     setError('')
-    setEmailError('')
     const res = await fetch('/api/unlock-report', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -87,7 +89,7 @@ export default function EmailGate({ assessmentId, initialUnlocked, percentile, s
     width:'100%', background:'#1a1a1a',
     border:`1px solid ${hasError ? '#EF4444' : '#333'}`,
     borderRadius:8, padding:'12px 14px', color:'#fff',
-    fontSize:'0.9rem', outline:'none', transition:'border-color 0.15s',
+    fontSize:'0.9rem', outline:'none',
   } as React.CSSProperties)
 
   const otherInputStyle = {
@@ -111,25 +113,58 @@ export default function EmailGate({ assessmentId, initialUnlocked, percentile, s
     <div style={{ background:'#111', border:'1px solid #333', borderRadius:16, padding:'1.75rem' }}>
       <div style={{ fontSize:'1.1rem', fontWeight:700, marginBottom:'0.4rem' }}>รับรายงานของคุณ</div>
       <div style={{ fontSize:'0.8rem', color:'#666', marginBottom:'1.25rem' }}>ขั้นตอนที่ 1/2 · ฟรี · ใช้เวลา 30 วินาที</div>
+
       <div style={{ height:3, background:'#222', borderRadius:2, marginBottom:'1.25rem' }}>
         <div style={{ width:'50%', height:'100%', background:'#3B82F6', borderRadius:2 }} />
       </div>
-      <div style={{ marginBottom:'0.75rem' }}>
+
+      {/* Email input */}
+      <div style={{ marginBottom:'1rem' }}>
         <input
           type="email"
           placeholder="your@email.com"
           value={email}
-          onChange={e => handleEmailChange(e.target.value)}
+          onChange={e => { setEmail(e.target.value); setEmailError('') }}
           onKeyDown={e => e.key === 'Enter' && handleEmailSubmit()}
           style={inputStyle(!!emailError)}
         />
         {emailError && <div style={{ fontSize:'0.78rem', color:'#EF4444', marginTop:6 }}>⚠️ {emailError}</div>}
-        {error && <div style={{ fontSize:'0.78rem', color:'#EF4444', marginTop:6 }}>{error}</div>}
       </div>
-      <button onClick={handleEmailSubmit} disabled={loading} style={{ width:'100%', background:loading ? '#333' : '#3B82F6', color:'#fff', border:'none', padding:'0.75rem', borderRadius:8, fontWeight:600, fontSize:'0.9rem', cursor:loading ? 'default' : 'pointer', marginBottom:'0.5rem' }}>
+
+      {/* PDPA Consent */}
+      <div
+        onClick={() => { setConsent(c => !c); setConsentError(false) }}
+        style={{ display:'flex', alignItems:'flex-start', gap:10, marginBottom:'1rem', cursor:'pointer', padding:'12px', borderRadius:10, background: consentError ? '#2a0a0a' : '#0f0f0f', border:`1px solid ${consentError ? '#EF4444' : '#222'}`, transition:'border-color 0.15s' }}
+      >
+        <div style={{ width:20, height:20, borderRadius:5, border:`2px solid ${consent ? '#3B82F6' : consentError ? '#EF4444' : '#444'}`, background: consent ? '#3B82F6' : 'transparent', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1, transition:'all 0.15s' }}>
+          {consent && <svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1 4L4 7.5L10 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+        </div>
+        <div style={{ fontSize:'0.8rem', color: consentError ? '#FCA5A5' : '#888', lineHeight:1.6 }}>
+          ฉันยินยอมให้ ZUME Datalab จัดเก็บอีเมลและข้อมูลที่กรอก เพื่อใช้ส่งรายงานและข้อมูลที่เป็นประโยชน์เกี่ยวกับสาย Data
+          {' '}
+          <span style={{ color:'#3B82F6', textDecoration:'underline', cursor:'pointer' }}>
+            (นโยบายความเป็นส่วนตัว)
+          </span>
+        </div>
+      </div>
+      {consentError && (
+        <div style={{ fontSize:'0.78rem', color:'#EF4444', marginBottom:'0.75rem' }}>
+          ⚠️ กรุณายอมรับเงื่อนไขก่อนดำเนินการต่อ
+        </div>
+      )}
+
+      {error && <div style={{ fontSize:'0.78rem', color:'#EF4444', marginBottom:'0.75rem' }}>{error}</div>}
+
+      <button
+        onClick={handleEmailSubmit}
+        disabled={loading}
+        style={{ width:'100%', background:loading ? '#333' : '#3B82F6', color:'#fff', border:'none', padding:'0.75rem', borderRadius:8, fontWeight:600, fontSize:'0.9rem', cursor:loading ? 'default' : 'pointer', marginBottom:'0.5rem' }}
+      >
         {loading ? 'กำลังบันทึก...' : 'ถัดไป →'}
       </button>
-      <button onClick={() => setStep('locked')} style={{ background:'none', border:'none', color:'#555', fontSize:'0.8rem', cursor:'pointer', width:'100%' }}>ยกเลิก</button>
+      <button onClick={() => setStep('locked')} style={{ background:'none', border:'none', color:'#555', fontSize:'0.8rem', cursor:'pointer', width:'100%' }}>
+        ยกเลิก
+      </button>
     </div>
   )
 
@@ -142,7 +177,6 @@ export default function EmailGate({ assessmentId, initialUnlocked, percentile, s
       </div>
       <div style={{ display:'flex', flexDirection:'column', gap:'0.75rem', marginBottom:'1rem' }}>
 
-        {/* Current Role */}
         <div>
           <label style={{ fontSize:'0.75rem', color:'#888', marginBottom:4, display:'block' }}>ตำแหน่งปัจจุบัน</label>
           <select value={roleCurrentVal} onChange={e => { setRoleCurrentVal(e.target.value); setRoleCurrentOther('') }} style={selectStyle}>
@@ -150,17 +184,10 @@ export default function EmailGate({ assessmentId, initialUnlocked, percentile, s
             {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
           {roleCurrentVal === 'อื่นๆ' && (
-            <input
-              type="text"
-              placeholder="โปรดระบุตำแหน่ง"
-              value={roleCurrentOther}
-              onChange={e => setRoleCurrentOther(e.target.value)}
-              style={otherInputStyle}
-            />
+            <input type="text" placeholder="โปรดระบุตำแหน่ง" value={roleCurrentOther} onChange={e => setRoleCurrentOther(e.target.value)} style={otherInputStyle} />
           )}
         </div>
 
-        {/* Years Exp */}
         <div>
           <label style={{ fontSize:'0.75rem', color:'#888', marginBottom:4, display:'block' }}>ประสบการณ์</label>
           <select value={yearsExpVal} onChange={e => setYearsExpVal(e.target.value)} style={selectStyle}>
@@ -169,7 +196,6 @@ export default function EmailGate({ assessmentId, initialUnlocked, percentile, s
           </select>
         </div>
 
-        {/* Target Role */}
         <div>
           <label style={{ fontSize:'0.75rem', color:'#888', marginBottom:4, display:'block' }}>ตำแหน่งที่อยากเป็น</label>
           <select value={targetRoleVal} onChange={e => { setTargetRoleVal(e.target.value); setTargetRoleOther('') }} style={selectStyle}>
@@ -177,17 +203,10 @@ export default function EmailGate({ assessmentId, initialUnlocked, percentile, s
             {TARGET_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
           {targetRoleVal === 'อื่นๆ' && (
-            <input
-              type="text"
-              placeholder="โปรดระบุตำแหน่งที่อยากเป็น"
-              value={targetRoleOther}
-              onChange={e => setTargetRoleOther(e.target.value)}
-              style={otherInputStyle}
-            />
+            <input type="text" placeholder="โปรดระบุตำแหน่งที่อยากเป็น" value={targetRoleOther} onChange={e => setTargetRoleOther(e.target.value)} style={otherInputStyle} />
           )}
         </div>
 
-        {/* Salary */}
         <div>
           <label style={{ fontSize:'0.75rem', color:'#888', marginBottom:4, display:'block' }}>เงินเดือน (บาท/เดือน)</label>
           <select value={salaryBandVal} onChange={e => setSalaryBandVal(e.target.value)} style={selectStyle}>
@@ -200,7 +219,9 @@ export default function EmailGate({ assessmentId, initialUnlocked, percentile, s
       <button onClick={handleProfileSubmit} disabled={loading} style={{ width:'100%', background:loading ? '#333' : '#3B82F6', color:'#fff', border:'none', padding:'0.75rem', borderRadius:8, fontWeight:600, fontSize:'0.9rem', cursor:loading ? 'default' : 'pointer', marginBottom:'0.5rem' }}>
         {loading ? 'กำลังบันทึก...' : 'ดูรายงานเลย →'}
       </button>
-      <button onClick={() => setStep('unlocked')} style={{ background:'none', border:'none', color:'#555', fontSize:'0.8rem', cursor:'pointer', width:'100%' }}>ข้ามขั้นตอนนี้</button>
+      <button onClick={() => setStep('unlocked')} style={{ background:'none', border:'none', color:'#555', fontSize:'0.8rem', cursor:'pointer', width:'100%' }}>
+        ข้ามขั้นตอนนี้
+      </button>
     </div>
   )
 
