@@ -12,86 +12,65 @@ interface Props {
 type Step = 'locked' | 'email' | 'profile' | 'unlocked'
 
 const ROLES = [
-  'Data Analyst',
-  'Business Analyst', 
-  'Data Engineer',
-  'Data Scientist',
-  'BI Developer',
-  'Marketing Analyst',
-  'Financial Analyst',
-  'Student / Fresh Grad',
-  'Other',
+  'Data Analyst','Business Analyst','Data Engineer','Data Scientist',
+  'BI Developer','Marketing Analyst','Financial Analyst','Student / Fresh Grad','อื่นๆ',
 ]
-
 const TARGET_ROLES = [
-  'Data Analyst',
-  'Senior Data Analyst',
-  'Data Scientist',
-  'Data Engineer',
-  'Analytics Manager',
-  'BI Developer',
-  'Other',
+  'Data Analyst','Senior Data Analyst','Data Scientist','Data Engineer',
+  'Analytics Manager','BI Developer','อื่นๆ',
 ]
+const EXP_OPTIONS = ['นักเรียน / นักศึกษา','0-1 ปี','1-3 ปี','3-5 ปี','5+ ปี']
+const SALARY_OPTIONS = ['ต่ำกว่า 20,000','20,000 - 35,000','35,000 - 55,000','55,000 - 80,000','80,000 - 120,000','120,000+']
 
-const EXP_OPTIONS = [
-  'นักเรียน / นักศึกษา',
-  '0-1 ปี',
-  '1-3 ปี',
-  '3-5 ปี',
-  '5+ ปี',
-]
-
-const SALARY_OPTIONS = [
-  'ต่ำกว่า 20,000',
-  '20,000 - 35,000',
-  '35,000 - 55,000',
-  '55,000 - 80,000',
-  '80,000 - 120,000',
-  '120,000+',
-]
+const isValidEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim())
 
 export default function EmailGate({ assessmentId, initialUnlocked, percentile, skillLabel }: Props) {
   const [step, setStep] = useState<Step>(initialUnlocked ? 'unlocked' : 'locked')
   const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
   const [roleCurrentVal, setRoleCurrentVal] = useState('')
-  const [yearsExpVal, setYearsExpVal] = useState('')
+  const [roleCurrentOther, setRoleCurrentOther] = useState('')
   const [targetRoleVal, setTargetRoleVal] = useState('')
+  const [targetRoleOther, setTargetRoleOther] = useState('')
+  const [yearsExpVal, setYearsExpVal] = useState('')
   const [salaryBandVal, setSalaryBandVal] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  const handleEmailChange = (val: string) => {
+    setEmail(val)
+    if (emailError) setEmailError('')
+  }
+
   const handleEmailSubmit = async () => {
-    if (!email) return
+    if (!email.trim()) { setEmailError('กรุณากรอกอีเมลก่อนนะ'); return }
+    if (!isValidEmail(email)) { setEmailError('อีเมลไม่ถูกต้อง เช่น name@email.com'); return }
     setLoading(true)
     setError('')
-
+    setEmailError('')
     const res = await fetch('/api/unlock-report', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, assessmentId }),
+      body: JSON.stringify({ email: email.trim(), assessmentId }),
     })
-
     const data = await res.json()
-    if (!res.ok) {
-      setError(data.error || 'Something went wrong')
-      setLoading(false)
-      return
-    }
-
+    if (!res.ok) { setError(data.error || 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง'); setLoading(false); return }
     setLoading(false)
     setStep('profile')
   }
 
   const handleProfileSubmit = async () => {
     setLoading(true)
+    const finalRole = roleCurrentVal === 'อื่นๆ' ? roleCurrentOther || 'อื่นๆ' : roleCurrentVal
+    const finalTarget = targetRoleVal === 'อื่นๆ' ? targetRoleOther || 'อื่นๆ' : targetRoleVal
     await fetch('/api/update-profile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email,
-        roleCurrent: roleCurrentVal,
+        email: email.trim(),
+        roleCurrent: finalRole,
         yearsExp: yearsExpVal,
-        targetRole: targetRoleVal,
+        targetRole: finalTarget,
         salaryBand: salaryBandVal,
       }),
     })
@@ -99,142 +78,143 @@ export default function EmailGate({ assessmentId, initialUnlocked, percentile, s
     setStep('unlocked')
   }
 
-  const handleSkipProfile = () => setStep('unlocked')
+  const selectStyle = {
+    width:'100%', background:'#1a1a1a', border:'1px solid #333',
+    borderRadius:8, padding:'10px 14px', color:'#fff', fontSize:'0.875rem', cursor:'pointer',
+  } as React.CSSProperties
 
-  const inputStyle = {
-    width: '100%',
-    background: '#1a1a1a',
-    border: '1px solid #333',
-    borderRadius: 8,
-    padding: '10px 14px',
-    color: '#fff',
-    fontSize: '0.875rem',
-    appearance: 'none' as const,
-    cursor: 'pointer',
-  }
-
-  const btnPrimary = (disabled?: boolean) => ({
-    width: '100%',
-    background: disabled ? '#333' : '#3B82F6',
-    color: '#fff',
-    border: 'none',
-    padding: '0.75rem',
-    borderRadius: 8,
-    fontWeight: 600,
-    fontSize: '0.9rem',
-    cursor: disabled ? 'default' : 'pointer',
-    marginBottom: '0.5rem',
+  const inputStyle = (hasError?: boolean) => ({
+    width:'100%', background:'#1a1a1a',
+    border:`1px solid ${hasError ? '#EF4444' : '#333'}`,
+    borderRadius:8, padding:'12px 14px', color:'#fff',
+    fontSize:'0.9rem', outline:'none', transition:'border-color 0.15s',
   } as React.CSSProperties)
 
-  // Locked state
+  const otherInputStyle = {
+    width:'100%', background:'#111', border:'1px solid #3B82F6',
+    borderRadius:8, padding:'10px 14px', color:'#fff',
+    fontSize:'0.875rem', outline:'none', marginTop:8,
+  } as React.CSSProperties
+
   if (step === 'locked') return (
-    <div style={{ background: '#111', border: '1px solid #333', borderRadius: 16, padding: '1.5rem' }}>
-      <div style={{ fontSize: '0.8rem', color: '#666', marginBottom: '0.4rem' }}>🔒 Full Report</div>
-      <div style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.25rem' }}>See how you rank vs peers</div>
-      <div style={{ fontSize: '0.8rem', color: '#666', marginBottom: '1rem' }}>Percentile · Skill breakdown · Personalized roadmap</div>
-      <button onClick={() => setStep('email')} style={{ background: '#3B82F6', color: '#fff', border: 'none', padding: '0.75rem 2rem', borderRadius: 8, fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer', width: '100%' }}>
-        Unlock Free Report
+    <div style={{ background:'#111', border:'1px solid #333', borderRadius:16, padding:'1.5rem' }}>
+      <div style={{ fontSize:'0.8rem', color:'#666', marginBottom:'0.4rem' }}>🔒 รายงานฉบับเต็ม</div>
+      <div style={{ fontSize:'1rem', fontWeight:600, marginBottom:'0.25rem' }}>ดูว่าคุณอยู่ระดับไหน</div>
+      <div style={{ fontSize:'0.8rem', color:'#666', marginBottom:'1rem' }}>Percentile · วิเคราะห์จุดแข็ง · แนะนำสิ่งที่ควรพัฒนา</div>
+      <button onClick={() => setStep('email')} style={{ background:'#3B82F6', color:'#fff', border:'none', padding:'0.75rem 2rem', borderRadius:8, fontWeight:600, fontSize:'0.9rem', cursor:'pointer', width:'100%' }}>
+        ปลดล็อกรายงานฟรี
       </button>
     </div>
   )
 
-  // Email step
   if (step === 'email') return (
-    <div style={{ background: '#111', border: '1px solid #333', borderRadius: 16, padding: '1.75rem' }}>
-      <div style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.4rem' }}>Get Your Full Report</div>
-      <div style={{ fontSize: '0.8rem', color: '#666', marginBottom: '1.25rem' }}>Step 1 of 2 · Free · ใช้เวลา 30 วินาที</div>
-
-      {/* Progress */}
-      <div style={{ height: 3, background: '#222', borderRadius: 2, marginBottom: '1.25rem' }}>
-        <div style={{ width: '50%', height: '100%', background: '#3B82F6', borderRadius: 2 }} />
+    <div style={{ background:'#111', border:'1px solid #333', borderRadius:16, padding:'1.75rem' }}>
+      <div style={{ fontSize:'1.1rem', fontWeight:700, marginBottom:'0.4rem' }}>รับรายงานของคุณ</div>
+      <div style={{ fontSize:'0.8rem', color:'#666', marginBottom:'1.25rem' }}>ขั้นตอนที่ 1/2 · ฟรี · ใช้เวลา 30 วินาที</div>
+      <div style={{ height:3, background:'#222', borderRadius:2, marginBottom:'1.25rem' }}>
+        <div style={{ width:'50%', height:'100%', background:'#3B82F6', borderRadius:2 }} />
       </div>
-
-      <input
-        type="email"
-        placeholder="your@email.com"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-        onKeyDown={e => e.key === 'Enter' && handleEmailSubmit()}
-        style={{ ...inputStyle, marginBottom: '0.75rem' }}
-      />
-      {error && <div style={{ fontSize: '0.75rem', color: '#EF4444', marginBottom: '0.5rem' }}>{error}</div>}
-      <button onClick={handleEmailSubmit} disabled={loading || !email} style={btnPrimary(!email || loading)}>
-        {loading ? 'Saving...' : 'Next →'}
+      <div style={{ marginBottom:'0.75rem' }}>
+        <input
+          type="email"
+          placeholder="your@email.com"
+          value={email}
+          onChange={e => handleEmailChange(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleEmailSubmit()}
+          style={inputStyle(!!emailError)}
+        />
+        {emailError && <div style={{ fontSize:'0.78rem', color:'#EF4444', marginTop:6 }}>⚠️ {emailError}</div>}
+        {error && <div style={{ fontSize:'0.78rem', color:'#EF4444', marginTop:6 }}>{error}</div>}
+      </div>
+      <button onClick={handleEmailSubmit} disabled={loading} style={{ width:'100%', background:loading ? '#333' : '#3B82F6', color:'#fff', border:'none', padding:'0.75rem', borderRadius:8, fontWeight:600, fontSize:'0.9rem', cursor:loading ? 'default' : 'pointer', marginBottom:'0.5rem' }}>
+        {loading ? 'กำลังบันทึก...' : 'ถัดไป →'}
       </button>
-      <button onClick={() => setStep('locked')} style={{ background: 'none', border: 'none', color: '#555', fontSize: '0.8rem', cursor: 'pointer', width: '100%' }}>
-        Cancel
-      </button>
+      <button onClick={() => setStep('locked')} style={{ background:'none', border:'none', color:'#555', fontSize:'0.8rem', cursor:'pointer', width:'100%' }}>ยกเลิก</button>
     </div>
   )
 
-  // Profile step
   if (step === 'profile') return (
-    <div style={{ background: '#111', border: '1px solid #3B82F6', borderRadius: 16, padding: '1.75rem' }}>
-      <div style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.4rem' }}>Where are you in Data?</div>
-      <div style={{ fontSize: '0.8rem', color: '#666', marginBottom: '1.25rem' }}>Step 2 of 2 · ช่วย personalize report ของคุณ</div>
-
-      {/* Progress */}
-      <div style={{ height: 3, background: '#222', borderRadius: 2, marginBottom: '1.25rem' }}>
-        <div style={{ width: '100%', height: '100%', background: '#3B82F6', borderRadius: 2 }} />
+    <div style={{ background:'#111', border:'1px solid #3B82F6', borderRadius:16, padding:'1.75rem' }}>
+      <div style={{ fontSize:'1.1rem', fontWeight:700, marginBottom:'0.4rem' }}>คุณอยู่ตรงไหนในสาย Data?</div>
+      <div style={{ fontSize:'0.8rem', color:'#666', marginBottom:'1.25rem' }}>ขั้นตอนที่ 2/2 · ช่วยให้รายงานแม่นยำขึ้น</div>
+      <div style={{ height:3, background:'#222', borderRadius:2, marginBottom:'1.25rem' }}>
+        <div style={{ width:'100%', height:'100%', background:'#3B82F6', borderRadius:2 }} />
       </div>
+      <div style={{ display:'flex', flexDirection:'column', gap:'0.75rem', marginBottom:'1rem' }}>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem' }}>
-
+        {/* Current Role */}
         <div>
-          <label style={{ fontSize: '0.75rem', color: '#888', marginBottom: 4, display: 'block' }}>Current Role</label>
-          <select value={roleCurrentVal} onChange={e => setRoleCurrentVal(e.target.value)} style={inputStyle}>
-            <option value="">เลือก role ปัจจุบัน</option>
+          <label style={{ fontSize:'0.75rem', color:'#888', marginBottom:4, display:'block' }}>ตำแหน่งปัจจุบัน</label>
+          <select value={roleCurrentVal} onChange={e => { setRoleCurrentVal(e.target.value); setRoleCurrentOther('') }} style={selectStyle}>
+            <option value="">เลือกตำแหน่ง</option>
             {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
+          {roleCurrentVal === 'อื่นๆ' && (
+            <input
+              type="text"
+              placeholder="โปรดระบุตำแหน่ง"
+              value={roleCurrentOther}
+              onChange={e => setRoleCurrentOther(e.target.value)}
+              style={otherInputStyle}
+            />
+          )}
         </div>
 
+        {/* Years Exp */}
         <div>
-          <label style={{ fontSize: '0.75rem', color: '#888', marginBottom: 4, display: 'block' }}>Years of Experience</label>
-          <select value={yearsExpVal} onChange={e => setYearsExpVal(e.target.value)} style={inputStyle}>
+          <label style={{ fontSize:'0.75rem', color:'#888', marginBottom:4, display:'block' }}>ประสบการณ์</label>
+          <select value={yearsExpVal} onChange={e => setYearsExpVal(e.target.value)} style={selectStyle}>
             <option value="">เลือกประสบการณ์</option>
             {EXP_OPTIONS.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
         </div>
 
+        {/* Target Role */}
         <div>
-          <label style={{ fontSize: '0.75rem', color: '#888', marginBottom: 4, display: 'block' }}>Target Role</label>
-          <select value={targetRoleVal} onChange={e => setTargetRoleVal(e.target.value)} style={inputStyle}>
-            <option value="">เลือก target role</option>
+          <label style={{ fontSize:'0.75rem', color:'#888', marginBottom:4, display:'block' }}>ตำแหน่งที่อยากเป็น</label>
+          <select value={targetRoleVal} onChange={e => { setTargetRoleVal(e.target.value); setTargetRoleOther('') }} style={selectStyle}>
+            <option value="">เลือกเป้าหมาย</option>
             {TARGET_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
+          {targetRoleVal === 'อื่นๆ' && (
+            <input
+              type="text"
+              placeholder="โปรดระบุตำแหน่งที่อยากเป็น"
+              value={targetRoleOther}
+              onChange={e => setTargetRoleOther(e.target.value)}
+              style={otherInputStyle}
+            />
+          )}
         </div>
 
+        {/* Salary */}
         <div>
-          <label style={{ fontSize: '0.75rem', color: '#888', marginBottom: 4, display: 'block' }}>Monthly Salary (THB)</label>
-          <select value={salaryBandVal} onChange={e => setSalaryBandVal(e.target.value)} style={inputStyle}>
-            <option value="">เลือก salary band</option>
+          <label style={{ fontSize:'0.75rem', color:'#888', marginBottom:4, display:'block' }}>เงินเดือน (บาท/เดือน)</label>
+          <select value={salaryBandVal} onChange={e => setSalaryBandVal(e.target.value)} style={selectStyle}>
+            <option value="">เลือกช่วงเงินเดือน</option>
             {SALARY_OPTIONS.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
         </div>
 
       </div>
-
-      <button onClick={handleProfileSubmit} disabled={loading} style={btnPrimary(loading)}>
-        {loading ? 'Saving...' : 'See My Report →'}
+      <button onClick={handleProfileSubmit} disabled={loading} style={{ width:'100%', background:loading ? '#333' : '#3B82F6', color:'#fff', border:'none', padding:'0.75rem', borderRadius:8, fontWeight:600, fontSize:'0.9rem', cursor:loading ? 'default' : 'pointer', marginBottom:'0.5rem' }}>
+        {loading ? 'กำลังบันทึก...' : 'ดูรายงานเลย →'}
       </button>
-      <button onClick={handleSkipProfile} style={{ background: 'none', border: 'none', color: '#555', fontSize: '0.8rem', cursor: 'pointer', width: '100%' }}>
-        Skip for now
-      </button>
+      <button onClick={() => setStep('unlocked')} style={{ background:'none', border:'none', color:'#555', fontSize:'0.8rem', cursor:'pointer', width:'100%' }}>ข้ามขั้นตอนนี้</button>
     </div>
   )
 
-  // Unlocked state
   return (
-    <div style={{ background: '#0f2a1a', border: '1px solid #10B981', borderRadius: 16, padding: '1.5rem' }}>
-      <div style={{ fontSize: '0.85rem', color: '#10B981', marginBottom: '0.5rem' }}>✅ Report Unlocked</div>
-      <div style={{ fontSize: '1rem', fontWeight: 600 }}>
+    <div style={{ background:'#0f2a1a', border:'1px solid #10B981', borderRadius:16, padding:'1.5rem' }}>
+      <div style={{ fontSize:'0.85rem', color:'#10B981', marginBottom:'0.5rem' }}>✅ ปลดล็อกแล้ว</div>
+      <div style={{ fontSize:'1rem', fontWeight:600 }}>
         {percentile
-          ? `You're in the top ${(100 - percentile).toFixed(0)}% of ${skillLabel} test takers`
-          : 'Percentile will be available once more users complete this assessment'}
+          ? `คุณอยู่ใน Top ${(100 - percentile).toFixed(0)}% ของผู้ทำ ${skillLabel}`
+          : 'Percentile จะแสดงเมื่อมีผู้ทดสอบมากขึ้น'}
       </div>
       {percentile && (
-        <div style={{ marginTop: '1rem', height: 6, background: '#0a1a10', borderRadius: 3, overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${100 - percentile}%`, background: '#10B981', borderRadius: 3 }} />
+        <div style={{ marginTop:'1rem', height:6, background:'#0a1a10', borderRadius:3, overflow:'hidden' }}>
+          <div style={{ height:'100%', width:`${100 - percentile}%`, background:'#10B981', borderRadius:3 }} />
         </div>
       )}
     </div>
