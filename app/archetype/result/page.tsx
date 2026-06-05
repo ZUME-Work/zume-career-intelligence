@@ -3,6 +3,7 @@ import { useSearchParams } from 'next/navigation'
 import { Suspense, useRef } from 'react'
 import { archetypeInfo, type ArchetypeKey } from '@/lib/archetypeQuestions'
 import Link from 'next/link'
+import ResultBanner from './ResultBanner'
 
 function ResultContent() {
   const searchParams = useSearchParams()
@@ -212,6 +213,7 @@ function ResultContent() {
   )
 }
 
+// banner added
 export default function ResultPage() {
   return (
     <Suspense fallback={
