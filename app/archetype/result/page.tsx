@@ -216,12 +216,15 @@ function ResultContent() {
 // banner added
 export default function ResultPage() {
   return (
-    <Suspense fallback={
+    <>
+      <ResultBanner />
+      <Suspense fallback={
       <div style={{ minHeight:'100vh', background:'#080C14', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontFamily:'system-ui,sans-serif' }}>
         กำลังโหลด...
       </div>
     }>
       <ResultContent />
     </Suspense>
+    </>
   )
 }
