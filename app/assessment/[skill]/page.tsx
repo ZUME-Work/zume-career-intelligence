@@ -14,6 +14,7 @@ export default function AssessmentPage() {
   const [seconds, setSeconds] = useState(0)
   const [loading, setLoading] = useState(true)
   const [redirecting, setRedirecting] = useState(false)
+  const [showExit, setShowExit] = useState(false)
   const isSubmitting = useRef(false)
 
   useEffect(() => {
@@ -53,31 +54,23 @@ export default function AssessmentPage() {
   const handleNext = async () => {
     if (!selected || isSubmitting.current || redirecting) return
     isSubmitting.current = true
-
     const q = questions[current]
     const newAnswers = { ...answers, [q.question_id]: selected }
     setAnswers(newAnswers)
     setSelected(null)
-
     if (current + 1 < questions.length) {
       setCurrent(current + 1)
       isSubmitting.current = false
       return
     }
-
     setRedirecting(true)
-
-    const correct = questions.filter(
-      q => newAnswers[q.question_id] === q.correct_answer
-    ).length
+    const correct = questions.filter(q => newAnswers[q.question_id] === q.correct_answer).length
     const score = Math.round((correct / questions.length) * 100)
-
     const res = await fetch('/api/submit-assessment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        skill,
-        score,
+        skill, score,
         totalQuestions: questions.length,
         correctCount: correct,
         durationSec: seconds,
@@ -88,7 +81,6 @@ export default function AssessmentPage() {
         })),
       }),
     })
-
     const result = await res.json()
     if (!res.ok) {
       console.error('submit error:', result.error)
@@ -106,22 +98,42 @@ export default function AssessmentPage() {
   }
 
   if (loading) return (
-    <main style={{ minHeight: '100vh', background: '#F8F9FA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ color: '#999', fontFamily: 'system-ui' }}>Loading...</div>
+    <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <div style={{ color:'#999', fontFamily:'system-ui' }}>กำลังโหลด...</div>
     </main>
   )
 
   if (redirecting) return (
-    <main style={{ minHeight: '100vh', background: '#F8F9FA', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
-      <div style={{ width: 40, height: 40, border: '3px solid #E8E6E0', borderTop: '3px solid #1B3A5C', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-      <div style={{ color: '#999', fontFamily: 'system-ui', fontSize: 14 }}>Calculating your results...</div>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:16 }}>
+      <div style={{ width:40, height:40, border:'3px solid #E8E6E0', borderTop:'3px solid #1B3A5C', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
+      <div style={{ color:'#999', fontFamily:'system-ui', fontSize:14 }}>กำลังคำนวณผล...</div>
+      <style>{`@keyframes spin { to { transform:rotate(360deg); } }`}</style>
+    </main>
+  )
+
+  if (showExit) return (
+    <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui,sans-serif', padding:'1rem' }}>
+      <div style={{ background:'#fff', borderRadius:20, padding:'2rem 1.75rem', maxWidth:380, width:'100%', boxShadow:'0 4px 32px rgba(0,0,0,0.1)', textAlign:'center' }}>
+        <div style={{ fontSize:44, marginBottom:16 }}>🚪</div>
+        <div style={{ fontSize:20, fontWeight:700, color:'#111', marginBottom:10 }}>ออกจากแบบทดสอบ?</div>
+        <div style={{ fontSize:15, color:'#666', lineHeight:1.7, marginBottom:28 }}>
+          คำตอบที่ทำไปแล้วจะไม่ถูกบันทึก<br />ต้องการออกจริงๆ ไหม?
+        </div>
+        <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+          <a href="/" style={{ display:'block', background:'#EF4444', color:'#fff', padding:'14px', borderRadius:12, textDecoration:'none', fontSize:15, fontWeight:700 }}>
+            ออกเลย
+          </a>
+          <button onClick={() => setShowExit(false)} style={{ background:'#F1F5F9', color:'#374151', border:'none', padding:'14px', borderRadius:12, fontSize:15, fontWeight:600, cursor:'pointer' }}>
+            ทำต่อเลย
+          </button>
+        </div>
+      </div>
     </main>
   )
 
   if (!questions.length) return (
-    <main style={{ minHeight: '100vh', background: '#F8F9FA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ color: '#999', fontFamily: 'system-ui' }}>No questions found for {skill}</div>
+    <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <div style={{ color:'#999', fontFamily:'system-ui' }}>ไม่พบคำถามสำหรับ {skill}</div>
     </main>
   )
 
@@ -131,56 +143,66 @@ export default function AssessmentPage() {
   return (
     <>
       <style>{`
-        * { box-sizing: border-box; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @media (max-width: 640px) {
-          .assessment-card { margin: 0 !important; border-radius: 0 !important; min-height: 100vh !important; box-shadow: none !important; }
-          .assessment-wrap { padding: 0 !important; align-items: flex-start !important; }
-          .q-text { font-size: 15px !important; }
-          .opt-text { font-size: 13px !important; }
-          .header-pad { padding: 12px 16px !important; }
-          .body-pad { padding: 20px 16px 16px !important; }
-          .footer-pad { padding: 12px 16px !important; }
+        * { box-sizing:border-box; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        @keyframes slideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        .q-wrap { animation:slideIn 0.28s ease both; }
+        .opt-card {
+          transition:all 0.15s; cursor:pointer;
+          -webkit-tap-highlight-color:transparent;
+          display:flex; align-items:center; gap:12px;
+          padding:14px 16px; border-radius:12px;
+          border:1.5px solid #E5E7EB; background:#FAFAFA;
+        }
+        .opt-card:hover { transform:translateX(3px); box-shadow:0 4px 12px rgba(0,0,0,0.08); border-color:#A5B4FC; background:#F5F3FF; }
+        .opt-card.selected { border:2px solid #4F46E5; background:#EEF2FF; box-shadow:0 2px 12px rgba(79,70,229,0.15); }
+        .exit-btn { background:none; border:none; font-size:13px; color:#ccc; cursor:pointer; padding:4px 8px; border-radius:6px; transition:color 0.15s; }
+        .exit-btn:hover { color:#999; }
+        .next-btn { transition:transform 0.15s, box-shadow 0.15s; }
+        .next-btn:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(79,70,229,0.3) !important; }
+        @media(max-width:480px) {
+          .q-text { font-size:17px !important; }
+          .quiz-pad { padding:1.5rem 1.25rem !important; }
         }
       `}</style>
-      <main className="assessment-wrap" style={{ minHeight: '100vh', background: '#F8F9FA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'system-ui, sans-serif', padding: '1rem' }}>
-        <div className="assessment-card" style={{ width: '100%', maxWidth: 640, background: '#fff', borderRadius: 16, boxShadow: '0 2px 24px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
 
-          {/* Header */}
-          <div className="header-pad" style={{ padding: '16px 24px', borderBottom: '0.5px solid #E8E6E0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <span style={{ background: '#EEF2FF', color: '#4F46E5', fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, whiteSpace: 'nowrap' }}>
+      <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', fontFamily:'system-ui,sans-serif', padding:'1rem' }}>
+
+        {/* Progress */}
+        <div style={{ width:'100%', maxWidth:580, marginBottom:'1.25rem' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+              <button className="exit-btn" onClick={() => setShowExit(true)}>← ออก</button>
+              <span style={{ fontSize:11, background:'#EEF2FF', color:'#4F46E5', padding:'4px 10px', borderRadius:6, fontWeight:600 }}>
                 {skillLabel[skill] ?? skill}
               </span>
-              <span style={{ fontSize: 12, color: '#666' }}>Q {current + 1}/{questions.length}</span>
             </div>
-            <span style={{ fontSize: 12, color: '#666', whiteSpace: 'nowrap' }}>⏱ {formatTime(seconds)}</span>
-          </div>
-
-          {/* Progress */}
-          <div style={{ height: 3, background: '#F0F0F0' }}>
-            <div style={{ height: '100%', width: `${progress}%`, background: '#4F46E5', transition: 'width 0.3s' }} />
-          </div>
-
-          {/* Question */}
-          <div className="body-pad" style={{ padding: '24px 24px 20px' }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: '#999', letterSpacing: 1, marginBottom: 12, textTransform: 'uppercase' }}>
-              {q.topic} · {q.difficulty}
+            <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+              <span style={{ fontSize:13, color:'#aaa' }}>⏱ {formatTime(seconds)}</span>
+              <span style={{ fontSize:13, color:'#aaa' }}>{current + 1}/{questions.length}</span>
             </div>
-            <div className="q-text" style={{ fontSize: 16, fontWeight: 500, color: '#1A1A1A', lineHeight: 1.6, borderLeft: '3px solid #4F46E5', paddingLeft: 14, marginBottom: 20 }}>
+          </div>
+          <div style={{ height:5, background:'#E5E7EB', borderRadius:3, overflow:'hidden' }}>
+            <div style={{ height:'100%', width:`${progress}%`, background:'#4F46E5', borderRadius:3, transition:'width 0.4s ease' }} />
+          </div>
+        </div>
+
+        {/* Card */}
+        <div className="q-wrap" style={{ width:'100%', maxWidth:580, background:'#fff', borderRadius:20, boxShadow:'0 4px 32px rgba(0,0,0,0.08)', overflow:'hidden' }}>
+          <div className="quiz-pad" style={{ padding:'2rem 1.75rem' }}>
+            <div className="q-text" style={{ fontSize:20, fontWeight:700, color:'#111', lineHeight:1.6, textAlign:'center', marginBottom:'1.75rem' }}>
               {q.question_text}
             </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
               {q.options.map((opt, i) => {
-                const key = ['A', 'B', 'C', 'D'][i]
-                const isSelected = selected === key
+                const key = ['A','B','C','D'][i]
+                const isSel = selected === key
                 return (
-                  <div key={key} onClick={() => setSelected(key)} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', border: isSelected ? '1.5px solid #4F46E5' : '0.5px solid #E8E6E0', borderRadius: 10, cursor: 'pointer', background: isSelected ? '#EEF2FF' : '#fff', transition: 'all 0.15s', WebkitTapHighlightColor: 'transparent' }}>
-                    <div style={{ width: 26, height: 26, borderRadius: 6, border: isSelected ? 'none' : '0.5px solid #ccc', background: isSelected ? '#4F46E5' : '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, color: isSelected ? '#fff' : '#999', flexShrink: 0 }}>
+                  <div key={key} className={`opt-card${isSel ? ' selected' : ''}`} onClick={() => setSelected(key)}>
+                    <div style={{ width:30, height:30, borderRadius:8, flexShrink:0, background:isSel ? '#4F46E5' : '#fff', border:isSel ? 'none' : '1.5px solid #E5E7EB', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color:isSel ? '#fff' : '#94A3B8' }}>
                       {key}
                     </div>
-                    <div className="opt-text" style={{ fontSize: 14, color: '#1A1A1A', lineHeight: 1.4 }}>
+                    <div style={{ fontSize:15, color:isSel ? '#1E1B4B' : '#374151', lineHeight:1.5, fontWeight:isSel ? 600 : 400 }}>
                       {opt.replace(/^[ABCD]\.\s/, '')}
                     </div>
                   </div>
@@ -189,22 +211,15 @@ export default function AssessmentPage() {
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="footer-pad" style={{ padding: '16px 24px', borderTop: '0.5px solid #E8E6E0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button onClick={handleSkip} style={{ fontSize: 13, color: '#999', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0' }}>
-              Skip
-            </button>
-            <button onClick={handleNext} disabled={!selected} style={{ fontSize: 13, fontWeight: 500, color: '#fff', background: selected ? '#1B3A5C' : '#ccc', border: 'none', borderRadius: 8, padding: '10px 24px', cursor: selected ? 'pointer' : 'default', minWidth: 80 }}>
-              {current + 1 === questions.length ? 'Submit' : 'Next'}
+          <div style={{ padding:'1rem 1.75rem 1.5rem', background:'#F8FAFC', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+            <button onClick={handleSkip} style={{ fontSize:13, color:'#bbb', background:'none', border:'none', cursor:'pointer' }}>ข้ามข้อนี้</button>
+            <button className="next-btn" onClick={handleNext} disabled={!selected} style={{ background:selected ? '#4F46E5' : '#E5E7EB', color:selected ? '#fff' : '#94A3B8', border:'none', borderRadius:10, padding:'11px 28px', fontSize:14, fontWeight:700, cursor:selected ? 'pointer' : 'default', boxShadow:selected ? '0 4px 14px rgba(79,70,229,0.25)' : 'none' }}>
+              {current + 1 === questions.length ? 'ส่งคำตอบ' : 'ถัดไป →'}
             </button>
           </div>
-
         </div>
 
-        {/* Page Footer */}
-        <div style={{ position: 'fixed', bottom: 12, left: 0, right: 0, textAlign: 'center', fontSize: '0.65rem', color: '#bbb', zIndex: 10 }}>
-          © 2026 ZUME Datalab · All rights reserved
-        </div>
+        <div style={{ marginTop:'1.5rem', fontSize:11, color:'#ddd' }}>© 2026 ZUME Datalab · All rights reserved</div>
       </main>
     </>
   )
