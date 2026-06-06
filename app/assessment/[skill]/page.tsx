@@ -30,17 +30,17 @@ export default function AssessmentPage() {
   }, [redirecting])
 
   const formatTime = (s: number) => `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`
-
   const skillLabel: Record<string,string> = { sql:'SQL', numerical:'Numerical', excel:'Excel', tableau:'Tableau' }
 
-  const getProgressColor = (current: number, total: number) => {
-    const pct = current / total
+  const getProgressColor = (cur: number, total: number) => {
+    const pct = cur / total
     if (pct < 0.4) return '#EF4444'
     if (pct < 0.7) return '#F59E0B'
     return '#10B981'
   }
 
   const progressColor = getProgressColor(current, questions.length || 10)
+  const progress = questions.length ? (current / questions.length) * 100 : 0
 
   const handleNext = async () => {
     if (!selected || isSubmitting.current || redirecting) return
@@ -66,11 +66,11 @@ export default function AssessmentPage() {
   const Navbar = () => (
     <nav style={{ background:'#fff', boxShadow:'0 1px 0 rgba(0,0,0,0.06)', position:'sticky', top:0, zIndex:100 }}>
       <div style={{ maxWidth:880, margin:'0 auto', padding:'13px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-        <a href="/" style={{ fontWeight:800, fontSize:17, color:'#111', textDecoration:'none', textShadow:'0 2px 8px rgba(0,0,0,0.08)' }}>
+        <a href="/" style={{ fontWeight:800, fontSize:17, color:'#111', textDecoration:'none' }}>
           ZUME <span style={{ color:'#4F46E5', fontWeight:500 }}>Datalab</span>
         </a>
         <a href="https://www.facebook.com/profile.php?id=61581811456373" target="_blank" rel="noopener noreferrer"
-          style={{ display:'flex', alignItems:'center', gap:7, background:'#fff', color:'#16A34A', padding:'7px 14px', borderRadius:20, textDecoration:'none', fontSize:13, fontWeight:600, boxShadow:'0 2px 8px rgba(22,163,74,0.15)' }}>
+          style={{ display:'flex', alignItems:'center', gap:7, color:'#16A34A', padding:'7px 14px', borderRadius:20, textDecoration:'none', fontSize:13, fontWeight:600, boxShadow:'0 2px 8px rgba(22,163,74,0.15)' }}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
           ZUME Datalab
         </a>
@@ -78,42 +78,35 @@ export default function AssessmentPage() {
     </nav>
   )
 
-  if (loading) return (
-    <><Navbar /><main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui' }}><div style={{ color:'#999' }}>กำลังโหลด...</div></main></>
-  )
+  if (loading) return <><Navbar /><main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui' }}><div style={{ color:'#999' }}>กำลังโหลด...</div></main></>
 
   if (redirecting) return (
-    <>
-      <Navbar />
-      <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:16, fontFamily:'system-ui' }}>
-        <div style={{ width:40, height:40, border:'3px solid #E8E6E0', borderTop:'3px solid #4F46E5', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
-        <div style={{ color:'#999', fontSize:14 }}>กำลังคำนวณผล...</div>
-        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-      </main>
-    </>
+    <><Navbar />
+    <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:16, fontFamily:'system-ui' }}>
+      <div style={{ width:40, height:40, border:'3px solid #E8E6E0', borderTop:`3px solid ${progressColor}`, borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
+      <div style={{ color:'#999', fontSize:14 }}>กำลังคำนวณผล...</div>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </main></>
   )
 
   if (showExit) return (
-    <>
-      <Navbar />
-      <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui', padding:'1rem' }}>
-        <div style={{ background:'#fff', borderRadius:20, padding:'2rem 1.75rem', maxWidth:380, width:'100%', boxShadow:'0 4px 32px rgba(0,0,0,0.1)', textAlign:'center' }}>
-          <div style={{ fontSize:44, marginBottom:16 }}>🚪</div>
-          <div style={{ fontSize:20, fontWeight:700, color:'#111', marginBottom:10 }}>ออกจากแบบทดสอบ?</div>
-          <div style={{ fontSize:15, color:'#666', lineHeight:1.7, marginBottom:28 }}>คำตอบที่ทำไปแล้วจะไม่ถูกบันทึก</div>
-          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-            <a href="/" style={{ display:'block', background:'#EF4444', color:'#fff', padding:'14px', borderRadius:12, textDecoration:'none', fontSize:15, fontWeight:700, boxShadow:'0 4px 12px rgba(239,68,68,0.3)' }}>ออกเลย</a>
-            <button onClick={() => setShowExit(false)} style={{ background:'#F1F5F9', color:'#374151', border:'none', padding:'14px', borderRadius:12, fontSize:15, fontWeight:600, cursor:'pointer' }}>ทำต่อเลย</button>
-          </div>
+    <><Navbar />
+    <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui', padding:'1rem' }}>
+      <div style={{ background:'#fff', borderRadius:20, padding:'2rem 1.75rem', maxWidth:380, width:'100%', boxShadow:'0 4px 32px rgba(0,0,0,0.1)', textAlign:'center' }}>
+        <div style={{ fontSize:44, marginBottom:16 }}>🚪</div>
+        <div style={{ fontSize:20, fontWeight:700, color:'#111', marginBottom:10 }}>ออกจากแบบทดสอบ?</div>
+        <div style={{ fontSize:15, color:'#666', lineHeight:1.7, marginBottom:28 }}>คำตอบที่ทำไปแล้วจะไม่ถูกบันทึก</div>
+        <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+          <a href="/" style={{ display:'block', background:'#EF4444', color:'#fff', padding:'14px', borderRadius:12, textDecoration:'none', fontSize:15, fontWeight:700, boxShadow:'0 4px 12px rgba(239,68,68,0.3)' }}>ออกเลย</a>
+          <button onClick={() => setShowExit(false)} style={{ background:'#F1F5F9', color:'#374151', border:'none', padding:'14px', borderRadius:12, fontSize:15, fontWeight:600, cursor:'pointer' }}>ทำต่อเลย</button>
         </div>
-      </main>
-    </>
+      </div>
+    </main></>
   )
 
   if (!questions.length) return <><Navbar /><main style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui' }}><div style={{ color:'#999' }}>ไม่พบคำถาม</div></main></>
 
   const q = questions[current]
-  const progress = (current / questions.length) * 100
 
   return (
     <>
@@ -122,8 +115,25 @@ export default function AssessmentPage() {
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
         .q-wrap { animation:slideIn 0.25s ease both; }
-        .opt-card { transition:all 0.15s; cursor:pointer; -webkit-tap-highlight-color:transparent; }
-        .opt-card:hover { transform:translateX(3px); box-shadow:0 4px 16px rgba(0,0,0,0.08) !important; }
+        .opt-card {
+          transition:transform 0.15s, box-shadow 0.15s, background 0.15s;
+          cursor:pointer;
+          -webkit-tap-highlight-color:transparent;
+          border:1.5px solid #E5E7EB;
+          background:#FAFAFA;
+        }
+        .opt-card:hover {
+          transform:translateY(-3px);
+          box-shadow:0 8px 20px rgba(0,0,0,0.1);
+          background:#fff;
+          border-color:#CBD5E1;
+        }
+        .opt-card.selected {
+          background:#fff;
+          border-color:#E5E7EB;
+          box-shadow:0 8px 20px rgba(0,0,0,0.1);
+          transform:translateY(-3px);
+        }
         .exit-btn { background:none; border:none; font-size:13px; color:#ccc; cursor:pointer; padding:4px 8px; border-radius:6px; transition:color 0.15s; }
         .exit-btn:hover { color:#999; }
         .next-btn { border:none; border-radius:10px; padding:11px 28px; font-size:14px; font-weight:700; cursor:pointer; transition:transform 0.15s, box-shadow 0.15s; }
@@ -150,9 +160,9 @@ export default function AssessmentPage() {
             </div>
           </div>
 
-          {/* Progress bar ไล่สี แดง→เหลือง→เขียว */}
+          {/* Progress bar — ไล่สีแดง→เหลือง→เขียวทีละข้อ */}
           <div style={{ height:6, background:'#E5E7EB', borderRadius:3, overflow:'hidden' }}>
-            <div style={{ height:'100%', width:`${progress}%`, background: progressColor, borderRadius:3, transition:'width 0.4s ease, background 0.6s ease', boxShadow:`0 0 8px ${progressColor}66` }} />
+            <div style={{ height:'100%', width:`${progress}%`, background:progressColor, borderRadius:3, transition:'width 0.4s ease, background 0.6s ease', boxShadow:`0 0 8px ${progressColor}66` }} />
           </div>
         </div>
 
@@ -166,12 +176,16 @@ export default function AssessmentPage() {
                 const key = ['A','B','C','D'][i]
                 const isSel = selected === key
                 return (
-                  <div key={key} className="opt-card" onClick={() => setSelected(key)}
-                    style={{ padding:'14px 16px', borderRadius:12, border: isSel ? `2px solid ${progressColor}` : '1.5px solid #E5E7EB', background: isSel ? `${progressColor}10` : '#FAFAFA', display:'flex', alignItems:'center', gap:12, boxShadow: isSel ? `0 2px 12px ${progressColor}25` : 'none' }}>
-                    <div style={{ width:30, height:30, borderRadius:8, flexShrink:0, background: isSel ? progressColor : '#fff', border: isSel ? 'none' : '1.5px solid #E5E7EB', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color: isSel ? '#fff' : '#94A3B8', boxShadow: isSel ? `0 2px 8px ${progressColor}44` : 'none' }}>
+                  <div
+                    key={key}
+                    className={`opt-card${isSel ? ' selected' : ''}`}
+                    onClick={() => setSelected(key)}
+                    style={{ padding:'14px 16px', borderRadius:12, display:'flex', alignItems:'center', gap:12 }}
+                  >
+                    <div style={{ width:30, height:30, borderRadius:8, flexShrink:0, background: isSel ? progressColor : '#F1F5F9', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color: isSel ? '#fff' : '#94A3B8', transition:'background 0.2s', boxShadow: isSel ? `0 2px 8px ${progressColor}44` : 'none' }}>
                       {key}
                     </div>
-                    <div style={{ fontSize:15, color: isSel ? '#111' : '#374151', lineHeight:1.5, fontWeight: isSel ? 600 : 400 }}>
+                    <div style={{ fontSize:15, color:'#374151', lineHeight:1.5, fontWeight: isSel ? 600 : 400 }}>
                       {opt.replace(/^[ABCD]\.\s/, '')}
                     </div>
                   </div>
