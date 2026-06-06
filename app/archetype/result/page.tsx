@@ -5,6 +5,23 @@ import { archetypeInfo, type ArchetypeKey } from '@/lib/archetypeQuestions'
 import Link from 'next/link'
 import ResultBanner from './ResultBanner'
 
+function Navbar() {
+  return (
+    <nav style={{ background:'#fff', boxShadow:'0 1px 0 rgba(0,0,0,0.06)', position:'sticky', top:0, zIndex:100 }}>
+      <div style={{ maxWidth:880, margin:'0 auto', padding:'13px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+        <a href="/" style={{ fontWeight:800, fontSize:17, color:'#111', textDecoration:'none' }}>
+          ZUME <span style={{ color:'#4F46E5', fontWeight:500 }}>Datalab</span>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61581811456373" target="_blank" rel="noopener noreferrer"
+          style={{ display:'flex', alignItems:'center', gap:7, background:'#fff', color:'#16A34A', padding:'7px 14px', borderRadius:20, textDecoration:'none', fontSize:13, fontWeight:600, boxShadow:'0 2px 8px rgba(22,163,74,0.15)' }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          ZUME Datalab
+        </a>
+      </div>
+    </nav>
+  )
+}
+
 function ResultContent() {
   const searchParams = useSearchParams()
   const cardRef = useRef<HTMLDivElement>(null)
@@ -39,95 +56,42 @@ function ResultContent() {
         .f4{animation:fadeUp 0.5s 0.24s ease both}
         .f5{animation:fadeUp 0.5s 0.32s ease both}
         .emoji-float { animation:floatAnim 3s ease-in-out infinite; display:inline-block; }
-        .strength-item {
-          display:flex; align-items:center; gap:10px;
-          background:#F8F9FA; border-radius:10px; padding:12px 14px;
-          border:1px solid #eee;
-          transition:transform 0.15s, box-shadow 0.15s;
-        }
-        .strength-item:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.08); }
-        .career-chip {
-          border-radius:10px; padding:10px 12px; text-align:center;
-          font-size:13px; font-weight:600; border:1px solid;
-          transition:transform 0.15s, box-shadow 0.15s;
-        }
+        .strength-item { display:flex; align-items:center; gap:10px; background:#F8F9FA; borderRadius:10px; padding:12px 14px; border:1px solid #eee; transition:transform 0.15s, box-shadow 0.15s; }
+        .strength-item:hover { transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.06); }
+        .career-chip { border-radius:10px; padding:10px 12px; text-align:center; font-size:13px; font-weight:600; border:1px solid; transition:transform 0.15s; }
         .career-chip:hover { transform:translateY(-2px); }
-        .arch-other {
-          border-radius:12px; padding:12px 8px; text-align:center;
-          transition:transform 0.15s, box-shadow 0.15s; border:1px solid;
-        }
+        .arch-other { border-radius:12px; padding:12px 8px; text-align:center; transition:transform 0.15s, box-shadow 0.15s; border:1px solid; }
         .arch-other:hover { transform:translateY(-3px); box-shadow:0 6px 16px rgba(0,0,0,0.08); }
-        .btn-save {
-          display:flex; align-items:center; justify-content:center; gap:8px;
-          background:#F4F4F5; color:#555; border:1px solid #E4E4E7;
-          border-radius:12px; padding:13px; font-size:15px; font-weight:600;
-          cursor:pointer; width:100%;
-          transition:transform 0.15s, box-shadow 0.15s;
-        }
+        .btn-save { display:flex; align-items:center; justify-content:center; gap:8px; background:#F4F4F5; color:#555; border:none; border-radius:12px; padding:13px; font-size:15px; font-weight:600; cursor:pointer; width:100%; transition:transform 0.15s, box-shadow 0.15s; }
         .btn-save:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,0.1); }
-        .btn-retry {
-          display:block; text-align:center; background:#F4F4F5; color:#888;
-          border:1px solid #E4E4E7; border-radius:12px; padding:13px;
-          font-size:14px; font-weight:500; text-decoration:none;
-          transition:transform 0.15s;
-        }
+        .btn-retry { display:block; text-align:center; background:#F4F4F5; color:#888; border:none; border-radius:12px; padding:13px; font-size:14px; font-weight:500; text-decoration:none; transition:transform 0.15s; }
         .btn-retry:hover { transform:translateY(-2px); }
-        .btn-skill {
-          display:block; text-align:center; border-radius:12px; padding:15px;
-          font-size:16px; font-weight:700; text-decoration:none;
-          transition:transform 0.15s, box-shadow 0.15s;
-        }
+        .btn-skill { display:block; text-align:center; border-radius:12px; padding:15px; font-size:16px; font-weight:700; text-decoration:none; transition:transform 0.15s, box-shadow 0.15s; }
         .btn-skill:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,0.15); }
-        .back-link { color:#aaa; font-size:14px; text-decoration:none; transition:color 0.15s; }
-        .back-link:hover { color:#555; }
         .wrap { width:100%; max-width:480px; margin:0 auto; padding:0 20px; }
         @media(min-width:640px) { .wrap { max-width:520px; padding:0 32px; } }
       `}</style>
 
-      <main style={{ minHeight:'100vh', background:'#FAFAFA', fontFamily:'system-ui,sans-serif', color:'#111', paddingBottom:48 }}>
+      <main style={{ minHeight:'calc(100vh - 50px)', background:'#F8F9FA', fontFamily:'system-ui,sans-serif', paddingBottom:48 }}>
+        <div className="wrap" style={{ paddingTop:24 }}>
 
-        {/* Nav */}
-        <div style={{ maxWidth:520, margin:'0 auto', padding:'16px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-          <Link href="/" className="back-link">← หน้าแรก</Link>
-          <Link href="/archetype" className="back-link">ทำใหม่อีกครั้ง</Link>
-        </div>
-
-        {/* Result Card */}
-        <div className="wrap">
           <div ref={cardRef} style={{ background:'#fff', borderRadius:24, padding:'28px 22px', border:'1px solid #eee', boxShadow:'0 2px 20px rgba(0,0,0,0.06)', marginBottom:16 }}>
-
-            {/* Badge */}
             <div className="f1" style={{ textAlign:'center', marginBottom:20 }}>
               <span style={{ fontSize:11, fontWeight:700, letterSpacing:1.5, color:info.color, textTransform:'uppercase', background:`${info.color}18`, padding:'6px 14px', borderRadius:20 }}>
                 Data Archetype
               </span>
             </div>
-
-            {/* Emoji */}
             <div className="f2" style={{ textAlign:'center', marginBottom:14 }}>
               <span className="emoji-float" style={{ fontSize:80, lineHeight:1 }}>{info.emoji}</span>
             </div>
-
-            {/* Name + Tagline */}
             <div className="f3" style={{ textAlign:'center', marginBottom:12 }}>
-              <div style={{ fontSize:'clamp(1.8rem,6vw,2.2rem)', fontWeight:800, color:'#111', letterSpacing:'-0.3px', marginBottom:6 }}>
-                {info.name}
-              </div>
-              <span style={{ fontSize:15, color:info.color, fontWeight:600, background:`${info.color}15`, padding:'4px 14px', borderRadius:20 }}>
-                {info.tagline}
-              </span>
+              <div style={{ fontSize:'clamp(1.8rem,6vw,2.2rem)', fontWeight:800, color:'#111', letterSpacing:'-0.3px', marginBottom:6 }}>{info.name}</div>
+              <span style={{ fontSize:15, color:info.color, fontWeight:600, background:`${info.color}15`, padding:'4px 14px', borderRadius:20 }}>{info.tagline}</span>
             </div>
-
-            {/* Description */}
-            <div className="f4" style={{ fontSize:16, color:'#555', lineHeight:1.8, textAlign:'center', marginBottom:24 }}>
-              {info.description}
-            </div>
-
+            <div className="f4" style={{ fontSize:16, color:'#555', lineHeight:1.8, textAlign:'center', marginBottom:24 }}>{info.description}</div>
             <div style={{ height:1, background:'#f0f0f0', marginBottom:22 }} />
-
-            {/* Strengths */}
             <div className="f4" style={{ marginBottom:20 }}>
-              <div style={{ fontSize:12, fontWeight:700, color:'#999', letterSpacing:1.5, textTransform:'uppercase', marginBottom:12 }}>จุดแข็งของคุณ</div>
+              <div style={{ fontSize:12, fontWeight:700, color:'#aaa', letterSpacing:1.5, textTransform:'uppercase', marginBottom:12 }}>จุดแข็งของคุณ</div>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
                 {info.strengths.map((s, i) => (
                   <div key={i} className="strength-item">
@@ -137,28 +101,20 @@ function ResultContent() {
                 ))}
               </div>
             </div>
-
-            {/* Blind spot */}
             <div className="f5" style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:12, padding:'14px 16px', marginBottom:20 }}>
               <div style={{ fontSize:11, fontWeight:700, color:'#D97706', letterSpacing:1.5, textTransform:'uppercase', marginBottom:6 }}>ระวังด้วยนะ</div>
               <div style={{ fontSize:14, color:'#666', lineHeight:1.7 }}>{info.blindspot}</div>
             </div>
-
-            {/* Careers */}
             <div className="f5">
-              <div style={{ fontSize:12, fontWeight:700, color:'#999', letterSpacing:1.5, textTransform:'uppercase', marginBottom:12 }}>สายงานที่เหมาะกับคุณ</div>
+              <div style={{ fontSize:12, fontWeight:700, color:'#aaa', letterSpacing:1.5, textTransform:'uppercase', marginBottom:12 }}>สายงานที่เหมาะกับคุณ</div>
               <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8 }}>
                 {info.careers.map((c, i) => (
-                  <div key={i} className="career-chip" style={{ background:`${info.color}12`, color:info.color, borderColor:`${info.color}33` }}>
-                    {c}
-                  </div>
+                  <div key={i} className="career-chip" style={{ background:`${info.color}12`, color:info.color, borderColor:`${info.color}33` }}>{c}</div>
                 ))}
               </div>
             </div>
-
           </div>
 
-          {/* Other archetypes */}
           <div className="f5" style={{ marginBottom:20 }}>
             <div style={{ fontSize:12, fontWeight:700, color:'#bbb', letterSpacing:1.5, textTransform:'uppercase', marginBottom:12, textAlign:'center' }}>Archetype อื่นๆ</div>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:8 }}>
@@ -171,9 +127,8 @@ function ResultContent() {
             </div>
           </div>
 
-          {/* Actions */}
           <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-            <Link href="/assessment/sql" className="btn-skill" style={{ background:info.color, color: ['#F59E0B','#10B981'].includes(info.color) ? '#000' : '#fff' }}>
+            <Link href="/assessment/sql" className="btn-skill" style={{ background:info.color, color:['#F59E0B','#10B981'].includes(info.color)?'#000':'#fff' }}>
               ทดสอบทักษะต่อเลย →
             </Link>
             <button onClick={handleSave} className="btn-save">
@@ -182,12 +137,8 @@ function ResultContent() {
             </button>
             <Link href="/archetype" className="btn-retry">ทำแบบทดสอบใหม่อีกครั้ง</Link>
           </div>
-
         </div>
-
-        <div style={{ textAlign:'center', marginTop:32, fontSize:12, color:'#ccc' }}>
-          © 2026 ZUME Datalab · All rights reserved
-        </div>
+        <div style={{ textAlign:'center', marginTop:32, fontSize:12, color:'#ccc' }}>© 2026 ZUME Datalab · All rights reserved</div>
       </main>
     </>
   )
@@ -196,12 +147,9 @@ function ResultContent() {
 export default function ResultPage() {
   return (
     <>
+      <Navbar />
       <ResultBanner />
-      <Suspense fallback={
-        <div style={{ minHeight:'100vh', background:'#FAFAFA', display:'flex', alignItems:'center', justifyContent:'center', color:'#999', fontFamily:'system-ui,sans-serif' }}>
-          กำลังโหลด...
-        </div>
-      }>
+      <Suspense fallback={<div style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', color:'#999', fontFamily:'system-ui,sans-serif' }}>กำลังโหลด...</div>}>
         <ResultContent />
       </Suspense>
     </>

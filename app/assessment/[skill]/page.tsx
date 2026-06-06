@@ -31,9 +31,16 @@ export default function AssessmentPage() {
 
   const formatTime = (s: number) => `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`
 
-  const skillLabel: Record<string,string> = {
-    sql:'SQL', numerical:'Numerical', excel:'Excel', tableau:'Tableau',
+  const skillLabel: Record<string,string> = { sql:'SQL', numerical:'Numerical', excel:'Excel', tableau:'Tableau' }
+
+  const getProgressColor = (current: number, total: number) => {
+    const pct = current / total
+    if (pct < 0.4) return '#EF4444'
+    if (pct < 0.7) return '#F59E0B'
+    return '#10B981'
   }
+
+  const progressColor = getProgressColor(current, questions.length || 10)
 
   const handleNext = async () => {
     if (!selected || isSubmitting.current || redirecting) return
@@ -56,35 +63,57 @@ export default function AssessmentPage() {
     router.push(`/results/${result.assessmentId}`)
   }
 
-  if (loading) return <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui' }}><div style={{ color:'#999' }}>กำลังโหลด...</div></main>
+  const Navbar = () => (
+    <nav style={{ background:'#fff', boxShadow:'0 1px 0 rgba(0,0,0,0.06)', position:'sticky', top:0, zIndex:100 }}>
+      <div style={{ maxWidth:880, margin:'0 auto', padding:'13px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+        <a href="/" style={{ fontWeight:800, fontSize:17, color:'#111', textDecoration:'none', textShadow:'0 2px 8px rgba(0,0,0,0.08)' }}>
+          ZUME <span style={{ color:'#4F46E5', fontWeight:500 }}>Datalab</span>
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61581811456373" target="_blank" rel="noopener noreferrer"
+          style={{ display:'flex', alignItems:'center', gap:7, background:'#fff', color:'#16A34A', padding:'7px 14px', borderRadius:20, textDecoration:'none', fontSize:13, fontWeight:600, boxShadow:'0 2px 8px rgba(22,163,74,0.15)' }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          ZUME Datalab
+        </a>
+      </div>
+    </nav>
+  )
+
+  if (loading) return (
+    <><Navbar /><main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui' }}><div style={{ color:'#999' }}>กำลังโหลด...</div></main></>
+  )
 
   if (redirecting) return (
-    <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:16, fontFamily:'system-ui' }}>
-      <div style={{ width:40, height:40, border:'3px solid #E8E6E0', borderTop:'3px solid #4F46E5', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
-      <div style={{ color:'#999', fontSize:14 }}>กำลังคำนวณผล...</div>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-    </main>
+    <>
+      <Navbar />
+      <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:16, fontFamily:'system-ui' }}>
+        <div style={{ width:40, height:40, border:'3px solid #E8E6E0', borderTop:'3px solid #4F46E5', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
+        <div style={{ color:'#999', fontSize:14 }}>กำลังคำนวณผล...</div>
+        <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      </main>
+    </>
   )
 
   if (showExit) return (
-    <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui', padding:'1rem' }}>
-      <div style={{ background:'#fff', borderRadius:20, padding:'2rem 1.75rem', maxWidth:380, width:'100%', boxShadow:'0 4px 32px rgba(0,0,0,0.1)', textAlign:'center' }}>
-        <div style={{ fontSize:44, marginBottom:16 }}>🚪</div>
-        <div style={{ fontSize:20, fontWeight:700, color:'#111', marginBottom:10 }}>ออกจากแบบทดสอบ?</div>
-        <div style={{ fontSize:15, color:'#666', lineHeight:1.7, marginBottom:28 }}>คำตอบที่ทำไปแล้วจะไม่ถูกบันทึก</div>
-        <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-          <a href="/" style={{ display:'block', background:'#EF4444', color:'#fff', padding:'14px', borderRadius:12, textDecoration:'none', fontSize:15, fontWeight:700, boxShadow:'0 4px 12px rgba(239,68,68,0.3)' }}>ออกเลย</a>
-          <button onClick={() => setShowExit(false)} style={{ background:'#F1F5F9', color:'#374151', border:'none', padding:'14px', borderRadius:12, fontSize:15, fontWeight:600, cursor:'pointer' }}>ทำต่อเลย</button>
+    <>
+      <Navbar />
+      <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui', padding:'1rem' }}>
+        <div style={{ background:'#fff', borderRadius:20, padding:'2rem 1.75rem', maxWidth:380, width:'100%', boxShadow:'0 4px 32px rgba(0,0,0,0.1)', textAlign:'center' }}>
+          <div style={{ fontSize:44, marginBottom:16 }}>🚪</div>
+          <div style={{ fontSize:20, fontWeight:700, color:'#111', marginBottom:10 }}>ออกจากแบบทดสอบ?</div>
+          <div style={{ fontSize:15, color:'#666', lineHeight:1.7, marginBottom:28 }}>คำตอบที่ทำไปแล้วจะไม่ถูกบันทึก</div>
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            <a href="/" style={{ display:'block', background:'#EF4444', color:'#fff', padding:'14px', borderRadius:12, textDecoration:'none', fontSize:15, fontWeight:700, boxShadow:'0 4px 12px rgba(239,68,68,0.3)' }}>ออกเลย</a>
+            <button onClick={() => setShowExit(false)} style={{ background:'#F1F5F9', color:'#374151', border:'none', padding:'14px', borderRadius:12, fontSize:15, fontWeight:600, cursor:'pointer' }}>ทำต่อเลย</button>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   )
 
-  if (!questions.length) return <main style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui' }}><div style={{ color:'#999' }}>ไม่พบคำถาม</div></main>
+  if (!questions.length) return <><Navbar /><main style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui' }}><div style={{ color:'#999' }}>ไม่พบคำถาม</div></main></>
 
   const q = questions[current]
   const progress = (current / questions.length) * 100
-  const timeLeft = seconds > 0 && seconds > 240
 
   return (
     <>
@@ -102,7 +131,9 @@ export default function AssessmentPage() {
         @media(max-width:480px){ .q-text{font-size:17px !important} .quiz-pad{padding:1.5rem 1.25rem !important} }
       `}</style>
 
-      <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', fontFamily:'system-ui,sans-serif', padding:'1rem' }}>
+      <Navbar />
+
+      <main style={{ minHeight:'calc(100vh - 50px)', background:'#F8F9FA', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', fontFamily:'system-ui,sans-serif', padding:'1rem' }}>
 
         <div style={{ width:'100%', maxWidth:580, marginBottom:'1.25rem' }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
@@ -111,15 +142,22 @@ export default function AssessmentPage() {
               <span style={{ fontSize:11, background:'#EEF2FF', color:'#4F46E5', padding:'4px 10px', borderRadius:6, fontWeight:700 }}>{skillLabel[skill] ?? skill}</span>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-              <span style={{ fontSize:13, color: timeLeft ? '#EF4444' : '#aaa', fontWeight: timeLeft ? 700 : 400 }}>⏱ {formatTime(seconds)}</span>
+              <span style={{ fontSize:13, color:'#aaa' }}>⏱ {formatTime(seconds)}</span>
               <span style={{ fontSize:14, fontWeight:700 }}>
-                <span style={{ color:'#4F46E5' }}>{current + 1}</span>
+                <span style={{ color: progressColor, fontSize:16 }}>{current + 1}</span>
                 <span style={{ color:'#CBD5E1' }}> / {questions.length}</span>
               </span>
             </div>
           </div>
-          <div style={{ height:5, background:'#E5E7EB', borderRadius:3, overflow:'hidden' }}>
-            <div style={{ height:'100%', width:`${progress}%`, background:'#4F46E5', borderRadius:3, transition:'width 0.4s ease', boxShadow:'0 0 8px rgba(79,70,229,0.4)' }} />
+
+          {/* Progress bar ไล่สี แดง→เหลือง→เขียว */}
+          <div style={{ height:6, background:'#E5E7EB', borderRadius:3, overflow:'hidden' }}>
+            <div style={{ height:'100%', width:`${progress}%`, background: progressColor, borderRadius:3, transition:'width 0.4s ease, background 0.6s ease', boxShadow:`0 0 8px ${progressColor}66` }} />
+          </div>
+          <div style={{ display:'flex', justifyContent:'space-between', marginTop:6, fontSize:11, color:'#ddd' }}>
+            <span style={{ color:'#EF4444' }}>เริ่มต้น</span>
+            <span style={{ color:'#F59E0B' }}>กลางทาง</span>
+            <span style={{ color:'#10B981' }}>เกือบถึงแล้ว!</span>
           </div>
         </div>
 
@@ -134,11 +172,11 @@ export default function AssessmentPage() {
                 const isSel = selected === key
                 return (
                   <div key={key} className="opt-card" onClick={() => setSelected(key)}
-                    style={{ padding:'14px 16px', borderRadius:12, border: isSel ? '2px solid #4F46E5' : '1.5px solid #E5E7EB', background: isSel ? '#EEF2FF' : '#FAFAFA', display:'flex', alignItems:'center', gap:12, boxShadow: isSel ? '0 2px 12px rgba(79,70,229,0.15)' : 'none' }}>
-                    <div style={{ width:30, height:30, borderRadius:8, flexShrink:0, background: isSel ? '#4F46E5' : '#fff', border: isSel ? 'none' : '1.5px solid #E5E7EB', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color: isSel ? '#fff' : '#94A3B8', boxShadow: isSel ? '0 2px 8px rgba(79,70,229,0.3)' : 'none' }}>
+                    style={{ padding:'14px 16px', borderRadius:12, border: isSel ? `2px solid ${progressColor}` : '1.5px solid #E5E7EB', background: isSel ? `${progressColor}10` : '#FAFAFA', display:'flex', alignItems:'center', gap:12, boxShadow: isSel ? `0 2px 12px ${progressColor}25` : 'none' }}>
+                    <div style={{ width:30, height:30, borderRadius:8, flexShrink:0, background: isSel ? progressColor : '#fff', border: isSel ? 'none' : '1.5px solid #E5E7EB', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color: isSel ? '#fff' : '#94A3B8', boxShadow: isSel ? `0 2px 8px ${progressColor}44` : 'none' }}>
                       {key}
                     </div>
-                    <div style={{ fontSize:15, color: isSel ? '#1E1B4B' : '#374151', lineHeight:1.5, fontWeight: isSel ? 600 : 400 }}>
+                    <div style={{ fontSize:15, color: isSel ? '#111' : '#374151', lineHeight:1.5, fontWeight: isSel ? 600 : 400 }}>
                       {opt.replace(/^[ABCD]\.\s/, '')}
                     </div>
                   </div>
@@ -150,7 +188,7 @@ export default function AssessmentPage() {
           <div style={{ padding:'1rem 1.75rem 1.5rem', background:'#F8FAFC', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
             <button onClick={() => { setSelected(null); if (current + 1 < questions.length) setCurrent(c => c + 1) }} style={{ fontSize:13, color:'#bbb', background:'none', border:'none', cursor:'pointer' }}>ข้ามข้อนี้</button>
             <button className="next-btn" onClick={handleNext} disabled={!selected}
-              style={{ background: selected ? '#4F46E5' : '#E5E7EB', color: selected ? '#fff' : '#94A3B8', boxShadow: selected ? '0 4px 14px rgba(79,70,229,0.3)' : 'none' }}>
+              style={{ background: selected ? progressColor : '#E5E7EB', color: selected ? '#fff' : '#94A3B8', boxShadow: selected ? `0 4px 14px ${progressColor}44` : 'none' }}>
               {current + 1 === questions.length ? 'ส่งคำตอบ' : 'ถัดไป →'}
             </button>
           </div>
