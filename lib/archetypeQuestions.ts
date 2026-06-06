@@ -27,10 +27,10 @@ export const archetypeQuestions: ArchetypeQuestion[] = [
     scenario: 'ได้รับ dataset ใหม่ขนาดใหญ่ที่ไม่เคยเห็นมาก่อน สิ่งแรกที่คุณทำคือ?',
     emoji: '📦',
     options: [
-      { text: '🧹 เช็ค data quality, null values, outliers', scores: { scientist: 3, engineer: 1 } },
+      { text: '🧹 ดูก่อนเลยว่าข้อมูลมีปัญหาไหม เช่น ข้อมูลหาย หรือผิดปกติ', scores: { scientist: 3, engineer: 1 } },
       { text: '🗺️ วางแผน structure และ schema ให้ชัดเจนก่อน', scores: { architect: 3, engineer: 1 } },
-      { text: '💡 หา pattern ที่น่าสนใจและ insight ที่ซ่อนอยู่', scores: { detective: 3, storyteller: 1 } },
-      { text: '📈 คิดว่าจะเอา data นี้ไป answer business question อะไรได้บ้าง', scores: { strategist: 3, storyteller: 1 } },
+      { text: '💡 หาว่ามีอะไรน่าสนใจซ่อนอยู่ในข้อมูลบ้าง', scores: { detective: 3, storyteller: 1 } },
+      { text: '📈 คิดก่อนว่าข้อมูลนี้จะตอบคำถามอะไรให้ธุรกิจได้', scores: { strategist: 3, storyteller: 1 } },
     ],
   },
   {
@@ -60,10 +60,10 @@ export const archetypeQuestions: ArchetypeQuestion[] = [
     scenario: 'คุณเจอ insight ที่น่าสนใจมากในข้อมูล แต่ยังพิสูจน์ไม่ได้ 100% คุณจะทำยังไง?',
     emoji: '💎',
     options: [
-      { text: '🧪 ออกแบบ experiment เพื่อ validate hypothesis', scores: { scientist: 3, detective: 1 } },
-      { text: '📢 share insight นี้กับทีมพร้อม caveat ที่ชัดเจน', scores: { storyteller: 2, strategist: 2 } },
-      { text: '🔍 ขุดหาหลักฐานเพิ่มจาก data source อื่น', scores: { detective: 3, scientist: 1 } },
-      { text: '⏳ รอจนมั่นใจก่อนค่อย present', scores: { scientist: 2, architect: 2 } },
+      { text: '🧪 ออกแบบการทดสอบเพื่อพิสูจน์ว่าที่คิดไว้ถูกไหม', scores: { scientist: 3, detective: 1 } },
+      { text: '📢 บอกทีมถึงสิ่งที่พบ พร้อมบอกด้วยว่ายังไม่แน่ใจตรงไหน', scores: { storyteller: 2, strategist: 2 } },
+      { text: '🔍 หาข้อมูลเพิ่มจากแหล่งอื่นเพื่อยืนยัน', scores: { detective: 3, scientist: 1 } },
+      { text: '⏳ รอให้มั่นใจก่อนค่อยนำเสนอ', scores: { scientist: 2, architect: 2 } },
     ],
   },
   {
@@ -82,10 +82,10 @@ export const archetypeQuestions: ArchetypeQuestion[] = [
     scenario: 'deadline พรุ่งนี้ แต่ data ที่ได้มา dirty มาก คุณจะทำยังไง?',
     emoji: '⏰',
     options: [
-      { text: '🧹 clean data ให้สะอาดที่สุดก่อน แม้ต้องทำทั้งคืน', scores: { engineer: 3, scientist: 1 } },
-      { text: '🎯 ใช้ sample ที่ clean แล้ว present พร้อม assumption', scores: { strategist: 3, storyteller: 1 } },
-      { text: '🔬 analyze เฉพาะส่วนที่น่าเชื่อถือ แล้วระบุ limitation', scores: { scientist: 3, detective: 1 } },
-      { text: '📞 negotiate deadline กับ stakeholder ก่อน', scores: { strategist: 2, architect: 2 } },
+      { text: '🧹 ทำความสะอาดข้อมูลก่อนทุกอย่าง แม้จะใช้เวลานาน', scores: { engineer: 3, scientist: 1 } },
+      { text: '🎯 เลือกใช้ข้อมูลที่ดีที่สุดที่มี แล้วบอกข้อสมมติให้ชัด', scores: { strategist: 3, storyteller: 1 } },
+      { text: '🔬 วิเคราะห์เฉพาะส่วนที่ข้อมูลดี แล้วบอกข้อจำกัดให้ชัด', scores: { scientist: 3, detective: 1 } },
+      { text: '📞 คุยกับทีมเพื่อขยับ deadline ก่อน', scores: { strategist: 2, architect: 2 } },
     ],
   },
   {
@@ -116,9 +116,9 @@ export const archetypeQuestions: ArchetypeQuestion[] = [
     emoji: '🏖️',
     options: [
       { text: '🕵️ scrape data แล้วหา pattern ที่ไม่มีใครเคยค้นพบ', scores: { detective: 3, scientist: 1 } },
-      { text: '⚙️ build data pipeline อัตโนมัติที่ elegant มากๆ', scores: { engineer: 3, architect: 1 } },
-      { text: '📊 ทำ visualization project ที่สวยงามและ tell story', scores: { storyteller: 3, detective: 1 } },
-      { text: '📐 ออกแบบ data model ที่ perfect สำหรับ business use case', scores: { architect: 3, strategist: 1 } },
+      { text: '⚙️ สร้างระบบดึงข้อมูลอัตโนมัติที่ทำงานได้เองโดยไม่ต้องแตะ', scores: { engineer: 3, architect: 1 } },
+      { text: '📊 ทำกราฟและชาร์ตที่เล่าเรื่องราวจากข้อมูลได้สวยงาม', scores: { storyteller: 3, detective: 1 } },
+      { text: '📐 ออกแบบโครงสร้างข้อมูลที่เหมาะกับการใช้งานจริง', scores: { architect: 3, strategist: 1 } },
     ],
   },
   {
@@ -126,10 +126,10 @@ export const archetypeQuestions: ArchetypeQuestion[] = [
     scenario: 'ผลการ analysis ของคุณขัดแย้งกับความเชื่อของ CEO คุณจะทำยังไง?',
     emoji: '😬',
     options: [
-      { text: '📋 present data อย่างตรงไปตรงมา พร้อม evidence ครบ', scores: { scientist: 3, detective: 1 } },
-      { text: '🎭 เลือก framing ที่ทำให้ data ดูน่าเชื่อและเข้าใจง่าย', scores: { storyteller: 3, strategist: 1 } },
-      { text: '🤝 หาจุดร่วมก่อน แล้วค่อยๆ introduce data', scores: { strategist: 3, storyteller: 1 } },
-      { text: '🔒 ตรวจสอบ analysis ซ้ำอีกรอบก่อน ต้องมั่นใจ 100%', scores: { scientist: 2, architect: 2 } },
+      { text: '📋 นำเสนอข้อมูลตรงๆ พร้อมหลักฐานให้ครบ', scores: { scientist: 3, detective: 1 } },
+      { text: '🎭 เลือกวิธีนำเสนอที่ทำให้ข้อมูลเข้าใจง่ายและน่าเชื่อถือ', scores: { storyteller: 3, strategist: 1 } },
+      { text: '🤝 หาสิ่งที่เห็นด้วยกันก่อน แล้วค่อยๆ นำข้อมูลเข้ามา', scores: { strategist: 3, storyteller: 1 } },
+      { text: '🔒 ตรวจสอบการวิเคราะห์ซ้ำก่อน ต้องมั่นใจก่อนบอกใคร', scores: { scientist: 2, architect: 2 } },
     ],
   },
   {
@@ -159,10 +159,10 @@ export const archetypeQuestions: ArchetypeQuestion[] = [
     scenario: 'เพื่อนร่วมงานบอกว่า code ของคุณ "ทำงานได้แต่อ่านยาก" คุณรู้สึกยังไง?',
     emoji: '💻',
     options: [
-      { text: '😤 ถ้า work ก็โอก optimize performance ก่อน readability', scores: { engineer: 2, detective: 2 } },
-      { text: '📝 refactor ทันที code ต้องเป็น documentation ในตัวเอง', scores: { architect: 3, engineer: 1 } },
-      { text: '🤷 เพิ่ม comment ให้ครบก็พอ ไม่ต้อง refactor ทั้งหมด', scores: { strategist: 2, scientist: 2 } },
-      { text: '👨‍🏫 นัด pair programming ช่วย walk through logic ด้วยกัน', scores: { storyteller: 3, architect: 1 } },
+      { text: '😤 ถ้าใช้งานได้ก็โอเค ขอให้เร็วก่อน อ่านง่ายทีหลัง', scores: { engineer: 2, detective: 2 } },
+      { text: '📝 แก้ code ทันที เพราะ code ที่ดีควรอ่านเข้าใจได้เองโดยไม่ต้องอธิบาย', scores: { architect: 3, engineer: 1 } },
+      { text: '🤷 เพิ่มคำอธิบายใน code ให้ครบก็พอ ไม่จำเป็นต้องเขียนใหม่ทั้งหมด', scores: { strategist: 2, scientist: 2 } },
+      { text: '👨‍🏫 นัดนั่งเขียน code ด้วยกันเพื่อช่วยอธิบาย logic', scores: { storyteller: 3, architect: 1 } },
     ],
   },
   {
