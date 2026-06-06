@@ -154,11 +154,6 @@ export default function AssessmentPage() {
           <div style={{ height:6, background:'#E5E7EB', borderRadius:3, overflow:'hidden' }}>
             <div style={{ height:'100%', width:`${progress}%`, background: progressColor, borderRadius:3, transition:'width 0.4s ease, background 0.6s ease', boxShadow:`0 0 8px ${progressColor}66` }} />
           </div>
-          <div style={{ display:'flex', justifyContent:'space-between', marginTop:6, fontSize:11, color:'#ddd' }}>
-            <span style={{ color:'#EF4444' }}>เริ่มต้น</span>
-            <span style={{ color:'#F59E0B' }}>กลางทาง</span>
-            <span style={{ color:'#10B981' }}>เกือบถึงแล้ว!</span>
-          </div>
         </div>
 
         <div className="q-wrap" style={{ width:'100%', maxWidth:580, background:'#fff', borderRadius:20, boxShadow:'0 4px 24px rgba(0,0,0,0.08)', overflow:'hidden' }}>

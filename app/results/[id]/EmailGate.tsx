@@ -21,7 +21,7 @@ const TARGET_ROLES = [
 ]
 const EXP_OPTIONS = ['นักเรียน / นักศึกษา','0-1 ปี','1-3 ปี','3-5 ปี','5+ ปี']
 
-const isValidEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim())
+const isValidEmail = (val: string) => /^[a-zA-Z0-9._%+\-]+@(gmail|yahoo|hotmail|outlook|icloud|live|msn|me|mac|protonmail|proton|ymail|rocketmail|aol|zoho|tutanota|fastmail|yandex|gmx|web)\.com$|^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.(com|co\.th|th|net|org|edu|ac\.th)$/.test(val.trim().toLowerCase())
 
 export default function EmailGate({ assessmentId, initialUnlocked, percentile, skillLabel }: Props) {
   const [step, setStep] = useState<Step>(initialUnlocked ? 'unlocked' : 'locked')

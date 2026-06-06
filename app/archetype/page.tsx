@@ -196,20 +196,12 @@ export default function ArchetypePage() {
             </div>
           </div>
 
-          <div style={{ padding:'0.75rem 1.75rem 1.25rem', background:'#F8FAFC', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <div style={{ padding:'0.5rem 1.75rem 1rem', background:'#F8FAFC', display:'flex', justifyContent:'center' }}>
             <div style={{ display:'flex', gap:4 }}>
               {archetypeQuestions.map((_, i) => (
                 <div key={i} style={{ width: i === current ? 16 : 6, height:6, borderRadius:3, background: i < current ? accentColor : i === current ? accentColor : '#E2E8F0', transition:'all 0.3s ease', opacity: i < current ? 0.5 : 1 }} />
               ))}
             </div>
-            <button
-              className="next-btn"
-              onClick={() => selected !== null && handleSelect(selected)}
-              disabled={selected === null}
-              style={{ background: selected !== null ? accentColor : '#E5E7EB', color: selected !== null ? '#fff' : '#94A3B8', boxShadow: selected !== null ? `0 4px 14px ${accentColor}44` : 'none' }}
-            >
-              {isLast ? 'ดูผลลัพธ์ 🎉' : 'ต่อไป →'}
-            </button>
           </div>
         </div>
 
