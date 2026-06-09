@@ -4,6 +4,62 @@ import { useParams, useRouter } from 'next/navigation'
 import { createSupabaseBrowser } from '@/lib/supabase'
 import type { Question } from '@/lib/types'
 
+const CSS = `
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+.nav{position:sticky;top:0;z-index:200;height:56px;background:rgba(10,10,10,0.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center}
+.nav-inner{width:100%;max-width:1120px;margin:0 auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:15px;font-weight:800;color:#fff;text-decoration:none;letter-spacing:-0.4px}
+.logo-dot{color:#6366F1}
+.nav-right{display:flex;align-items:center;gap:12px}
+.skill-badge{font-size:11px;font-weight:600;color:#6366F1;background:rgba(99,102,241,0.12);padding:4px 10px;border-radius:5px;letter-spacing:.06em;text-transform:uppercase}
+.nav-exit{background:none;border:none;font-size:13px;color:rgba(255,255,255,0.3);cursor:pointer;font-family:inherit;transition:color .15s;padding:4px 8px}
+.nav-exit:hover{color:rgba(255,255,255,0.6)}
+
+.progress-bar-outer{height:2px;background:rgba(255,255,255,0.07);width:100%}
+.progress-bar-inner{height:100%;transition:width .4s ease,background .6s ease}
+
+.main{min-height:calc(100vh - 58px);background:#0A0A0A;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.quiz-meta{width:100%;max-width:600px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.meta-left{display:flex;align-items:center;gap:8px}
+.meta-back{background:none;border:none;color:rgba(255,255,255,0.25);font-size:13px;cursor:pointer;font-family:inherit;transition:color .15s;padding:0;display:flex;align-items:center;gap:5px}
+.meta-back:hover{color:rgba(255,255,255,0.5)}
+.meta-count{font-size:13px;color:rgba(255,255,255,0.25);font-weight:500}
+.meta-count em{font-style:normal;font-size:16px;font-weight:800;color:#6366F1}
+.meta-timer{font-size:12px;color:rgba(255,255,255,0.2);font-variant-numeric:tabular-nums}
+
+.quiz-card{width:100%;max-width:600px;background:#111;border:1px solid rgba(255,255,255,0.07);border-radius:18px;overflow:hidden}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.q-anim{animation:slideIn .22s ease both}
+.quiz-q{padding:32px 28px 24px;font-size:18px;font-weight:600;color:#fff;line-height:1.65;text-align:center}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;padding:0 20px 24px}
+.opt-btn{width:100%;text-align:left;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:15px 18px;font-size:15px;color:rgba(255,255,255,0.6);font-family:inherit;cursor:pointer;transition:transform .15s,border-color .15s,background .15s,color .15s;display:flex;align-items:center;gap:12px;line-height:1.5}
+.opt-btn:hover{transform:translateX(4px);border-color:rgba(255,255,255,0.18);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.9)}
+.opt-btn.sel{border-color:#6366F1;background:rgba(99,102,241,0.1);color:#fff;transform:translateX(4px)}
+.opt-key{width:28px;height:28px;border-radius:7px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);flex-shrink:0;transition:background .15s,color .15s}
+.opt-btn.sel .opt-key{background:#6366F1;color:#fff}
+.quiz-footer{background:rgba(255,255,255,0.02);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.05)}
+.btn-skip{background:none;border:none;font-size:13px;color:rgba(255,255,255,0.2);cursor:pointer;font-family:inherit;transition:color .15s}
+.btn-skip:hover{color:rgba(255,255,255,0.4)}
+.btn-next{border:none;border-radius:9px;padding:11px 28px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:transform .15s,box-shadow .15s,opacity .15s}
+.btn-next:enabled:hover{transform:translateY(-2px)}
+.btn-next:disabled{opacity:.3;cursor:default}
+
+.loader{min-height:100vh;background:#0A0A0A;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-family:'Inter',sans-serif;font-size:14px}
+.spinner{width:36px;height:36px;border:2px solid rgba(255,255,255,0.08);border-top-color:#6366F1;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px}
+.spin-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.exit-modal{min-height:100vh;background:#0A0A0A;display:flex;align-items:center;justify-content:center;padding:24px;font-family:'Inter',sans-serif}
+.modal-box{background:#141414;border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:32px 28px;max-width:360px;width:100%;text-align:center}
+.modal-title{font-size:20px;font-weight:700;color:#fff;margin-bottom:8px;letter-spacing:-0.3px}
+.modal-sub{font-size:14px;color:rgba(255,255,255,0.4);line-height:1.7;margin-bottom:28px}
+.btn-exit-confirm{display:block;width:100%;background:#EF4444;color:#fff;border:none;padding:14px;border-radius:11px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:8px;transition:opacity .15s}
+.btn-exit-confirm:hover{opacity:.9}
+.btn-continue{display:block;width:100%;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.07);padding:14px;border-radius:11px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s}
+.btn-continue:hover{background:rgba(255,255,255,0.08)}
+`
+
 export default function AssessmentPage() {
   const { skill } = useParams<{ skill: string }>()
   const router = useRouter()
@@ -25,22 +81,14 @@ export default function AssessmentPage() {
 
   useEffect(() => {
     if (redirecting) return
-    const timer = setInterval(() => setSeconds(s => s + 1), 1000)
-    return () => clearInterval(timer)
+    const t = setInterval(() => setSeconds(s => s + 1), 1000)
+    return () => clearInterval(t)
   }, [redirecting])
 
-  const formatTime = (s: number) => `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`
-  const skillLabel: Record<string,string> = { sql:'SQL', numerical:'Numerical', excel:'Excel', tableau:'Tableau' }
-
-  const getProgressColor = (cur: number, total: number) => {
-    const pct = cur / total
-    if (pct < 0.4) return '#EF4444'
-    if (pct < 0.7) return '#F59E0B'
-    return '#10B981'
-  }
-
-  const progressColor = getProgressColor(current, questions.length || 10)
-  const progress = questions.length ? (current / questions.length) * 100 : 0
+  const fmt = (s: number) => `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`
+  const LABEL: Record<string,string> = { sql:'SQL', numerical:'Numerical', excel:'Excel', tableau:'Tableau' }
+  const pct = questions.length ? (current / questions.length) * 100 : 0
+  const pColor = pct < 40 ? '#EF4444' : pct < 70 ? '#F59E0B' : '#10B981'
 
   const handleNext = async () => {
     if (!selected || isSubmitting.current || redirecting) return
@@ -49,7 +97,7 @@ export default function AssessmentPage() {
     const newAnswers = { ...answers, [q.question_id]: selected }
     setAnswers(newAnswers)
     setSelected(null)
-    if (current + 1 < questions.length) { setCurrent(current + 1); isSubmitting.current = false; return }
+    if (current + 1 < questions.length) { setCurrent(c => c+1); isSubmitting.current = false; return }
     setRedirecting(true)
     const correct = questions.filter(q => newAnswers[q.question_id] === q.correct_answer).length
     const score = Math.round((correct / questions.length) * 100)
@@ -63,148 +111,67 @@ export default function AssessmentPage() {
     router.push(`/results/${result.assessmentId}`)
   }
 
-  const Navbar = () => (
-    <nav style={{ background:'#fff', boxShadow:'0 1px 0 rgba(0,0,0,0.06)', position:'sticky', top:0, zIndex:100 }}>
-      <div style={{ maxWidth:880, margin:'0 auto', padding:'13px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-        <a href="/" style={{ fontWeight:800, fontSize:17, color:'#111', textDecoration:'none' }}>
-          ZUME <span style={{ color:'#4F46E5', fontWeight:500 }}>Datalab</span>
-        </a>
-        <a href="https://www.facebook.com/profile.php?id=61581811456373" target="_blank" rel="noopener noreferrer"
-          style={{ display:'flex', alignItems:'center', gap:7, color:'#16A34A', padding:'7px 14px', borderRadius:20, textDecoration:'none', fontSize:13, fontWeight:600, boxShadow:'0 2px 8px rgba(22,163,74,0.15)' }}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-          ZUME Datalab
-        </a>
-      </div>
-    </nav>
-  )
-
-  if (loading) return <><Navbar /><main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui' }}><div style={{ color:'#999' }}>กำลังโหลด...</div></main></>
-
-  if (redirecting) return (
-    <><Navbar />
-    <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:16, fontFamily:'system-ui' }}>
-      <div style={{ width:40, height:40, border:'3px solid #E8E6E0', borderTop:`3px solid ${progressColor}`, borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
-      <div style={{ color:'#999', fontSize:14 }}>กำลังคำนวณผล...</div>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-    </main></>
-  )
-
+  if (loading) return <><style>{CSS}</style><div className="loader"><div className="spin-wrap"><div className="spinner"/><span>กำลังโหลด...</span></div></div></>
+  if (redirecting) return <><style>{CSS}</style><div className="loader"><div className="spin-wrap"><div className="spinner" style={{borderTopColor:'#10B981'}}/><span>กำลังคำนวณผล...</span></div></div></>
   if (showExit) return (
-    <><Navbar />
-    <main style={{ minHeight:'100vh', background:'#F8F9FA', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui', padding:'1rem' }}>
-      <div style={{ background:'#fff', borderRadius:20, padding:'2rem 1.75rem', maxWidth:380, width:'100%', boxShadow:'0 4px 32px rgba(0,0,0,0.1)', textAlign:'center' }}>
-        <div style={{ fontSize:44, marginBottom:16 }}>🚪</div>
-        <div style={{ fontSize:20, fontWeight:700, color:'#111', marginBottom:10 }}>ออกจากแบบทดสอบ?</div>
-        <div style={{ fontSize:15, color:'#666', lineHeight:1.7, marginBottom:28 }}>คำตอบที่ทำไปแล้วจะไม่ถูกบันทึก</div>
-        <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-          <a href="/" style={{ display:'block', background:'#EF4444', color:'#fff', padding:'14px', borderRadius:12, textDecoration:'none', fontSize:15, fontWeight:700, boxShadow:'0 4px 12px rgba(239,68,68,0.3)' }}>ออกเลย</a>
-          <button onClick={() => setShowExit(false)} style={{ background:'#F1F5F9', color:'#374151', border:'none', padding:'14px', borderRadius:12, fontSize:15, fontWeight:600, cursor:'pointer' }}>ทำต่อเลย</button>
-        </div>
+    <><style>{CSS}</style>
+    <div className="exit-modal">
+      <div className="modal-box">
+        <div className="modal-title">ออกจากแบบทดสอบ?</div>
+        <p className="modal-sub">คำตอบที่ทำไปแล้วจะไม่ถูกบันทึก</p>
+        <a href="/" className="btn-exit-confirm">ออกเลย</a>
+        <button className="btn-continue" onClick={() => setShowExit(false)}>ทำต่อเลย</button>
       </div>
-    </main></>
+    </div></>
   )
-
-  if (!questions.length) return <><Navbar /><main style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'system-ui' }}><div style={{ color:'#999' }}>ไม่พบคำถาม</div></main></>
+  if (!questions.length) return <><style>{CSS}</style><div className="loader">ไม่พบคำถาม</div></>
 
   const q = questions[current]
-
   return (
-    <>
-      <style>{`
-        * { box-sizing:border-box; margin:0; padding:0; }
-        @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-        .q-wrap { animation:slideIn 0.25s ease both; }
-        .opt-card {
-          transition:transform 0.15s, box-shadow 0.15s, background 0.15s;
-          cursor:pointer;
-          -webkit-tap-highlight-color:transparent;
-          border:1.5px solid #E5E7EB;
-          background:#FAFAFA;
-        }
-        .opt-card:hover {
-          transform:translateY(-3px);
-          box-shadow:0 8px 20px rgba(0,0,0,0.1);
-          background:#fff;
-          border-color:#CBD5E1;
-        }
-        .opt-card.selected {
-          background:#fff;
-          border-color:#E5E7EB;
-          box-shadow:0 8px 20px rgba(0,0,0,0.1);
-          transform:translateY(-3px);
-        }
-        .exit-btn { background:none; border:none; font-size:13px; color:#ccc; cursor:pointer; padding:4px 8px; border-radius:6px; transition:color 0.15s; }
-        .exit-btn:hover { color:#999; }
-        .next-btn { border:none; border-radius:10px; padding:11px 28px; font-size:14px; font-weight:700; cursor:pointer; transition:transform 0.15s, box-shadow 0.15s; }
-        .next-btn:enabled:hover { transform:translateY(-2px); }
-        @media(max-width:480px){ .q-text{font-size:17px !important} .quiz-pad{padding:1.5rem 1.25rem !important} }
-      `}</style>
-
-      <Navbar />
-
-      <main style={{ minHeight:'calc(100vh - 50px)', background:'#F8F9FA', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', fontFamily:'system-ui,sans-serif', padding:'1rem' }}>
-
-        <div style={{ width:'100%', maxWidth:580, marginBottom:'1.25rem' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
-            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-              <button className="exit-btn" onClick={() => setShowExit(true)}>← ออก</button>
-              <span style={{ fontSize:11, background:'#EEF2FF', color:'#4F46E5', padding:'4px 10px', borderRadius:6, fontWeight:700 }}>{skillLabel[skill] ?? skill}</span>
-            </div>
-            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-              <span style={{ fontSize:13, color:'#aaa' }}>⏱ {formatTime(seconds)}</span>
-              <span style={{ fontSize:14, fontWeight:700 }}>
-                <span style={{ color: progressColor, fontSize:16 }}>{current + 1}</span>
-                <span style={{ color:'#CBD5E1' }}> / {questions.length}</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Progress bar — ไล่สีแดง→เหลือง→เขียวทีละข้อ */}
-          <div style={{ height:6, background:'#E5E7EB', borderRadius:3, overflow:'hidden' }}>
-            <div style={{ height:'100%', width:`${progress}%`, background:progressColor, borderRadius:3, transition:'width 0.4s ease, background 0.6s ease', boxShadow:`0 0 8px ${progressColor}66` }} />
-          </div>
+    <><style>{CSS}</style>
+    <nav className="nav">
+      <div className="nav-inner">
+        <a href="/" className="logo">ZUME<span className="logo-dot">.</span>Datalab</a>
+        <div className="nav-right">
+          <span className="skill-badge">{LABEL[skill]??skill}</span>
+          <span className="meta-timer">⏱ {fmt(seconds)}</span>
+          <button className="nav-exit" onClick={() => setShowExit(true)}>✕ ออก</button>
         </div>
-
-        <div className="q-wrap" style={{ width:'100%', maxWidth:580, background:'#fff', borderRadius:20, boxShadow:'0 4px 24px rgba(0,0,0,0.08)', overflow:'hidden' }}>
-          <div className="quiz-pad" style={{ padding:'2rem 1.75rem' }}>
-            <div className="q-text" style={{ fontSize:19, fontWeight:700, color:'#111', lineHeight:1.7, textAlign:'center', marginBottom:'1.75rem' }}>
-              {q.question_text}
-            </div>
-            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-              {q.options.map((opt, i) => {
-                const key = ['A','B','C','D'][i]
-                const isSel = selected === key
-                return (
-                  <div
-                    key={key}
-                    className={`opt-card${isSel ? ' selected' : ''}`}
-                    onClick={() => setSelected(key)}
-                    style={{ padding:'14px 16px', borderRadius:12, display:'flex', alignItems:'center', gap:12 }}
-                  >
-                    <div style={{ width:30, height:30, borderRadius:8, flexShrink:0, background: isSel ? progressColor : '#F1F5F9', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color: isSel ? '#fff' : '#94A3B8', transition:'background 0.2s', boxShadow: isSel ? `0 2px 8px ${progressColor}44` : 'none' }}>
-                      {key}
-                    </div>
-                    <div style={{ fontSize:15, color:'#374151', lineHeight:1.5, fontWeight: isSel ? 600 : 400 }}>
-                      {opt.replace(/^[ABCD]\.\s/, '')}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          <div style={{ padding:'1rem 1.75rem 1.5rem', background:'#F8FAFC', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-            <button onClick={() => { setSelected(null); if (current + 1 < questions.length) setCurrent(c => c + 1) }} style={{ fontSize:13, color:'#bbb', background:'none', border:'none', cursor:'pointer' }}>ข้ามข้อนี้</button>
-            <button className="next-btn" onClick={handleNext} disabled={!selected}
-              style={{ background: selected ? progressColor : '#E5E7EB', color: selected ? '#fff' : '#94A3B8', boxShadow: selected ? `0 4px 14px ${progressColor}44` : 'none' }}>
-              {current + 1 === questions.length ? 'ส่งคำตอบ' : 'ถัดไป →'}
-            </button>
-          </div>
+      </div>
+    </nav>
+    <div className="progress-bar-outer">
+      <div className="progress-bar-inner" style={{ width:`${pct}%`, background:pColor }}/>
+    </div>
+    <div className="main">
+      <div className="quiz-meta">
+        <div className="meta-left">
+          <button className="meta-back" onClick={() => current > 0 ? (setCurrent(c=>c-1), setSelected(null)) : setShowExit(true)}>← ย้อนกลับ</button>
         </div>
-
-        <div style={{ marginTop:'1.5rem', fontSize:11, color:'#ddd' }}>© 2026 ZUME Datalab · All rights reserved</div>
-      </main>
+        <div className="meta-count"><em style={{color:pColor}}>{current+1}</em> / {questions.length}</div>
+      </div>
+      <div className="quiz-card q-anim" key={current}>
+        <div className="quiz-q">{q.question_text}</div>
+        <div className="quiz-opts">
+          {q.options.map((opt, i) => {
+            const key = ['A','B','C','D'][i]
+            const isSel = selected === key
+            return (
+              <button key={key} className={`opt-btn${isSel?' sel':''}`} onClick={() => setSelected(key)}>
+                <span className="opt-key">{key}</span>
+                {opt.replace(/^[ABCD]\.\s/,'')}
+              </button>
+            )
+          })}
+        </div>
+        <div className="quiz-footer">
+          <button className="btn-skip" onClick={() => { setSelected(null); if(current+1<questions.length) setCurrent(c=>c+1) }}>ข้ามข้อนี้</button>
+          <button className="btn-next" onClick={handleNext} disabled={!selected}
+            style={{ background:selected?pColor:'rgba(255,255,255,0.08)', color:selected?'#fff':'rgba(255,255,255,0.25)', boxShadow:selected?`0 4px 14px ${pColor}44`:'none' }}>
+            {current+1===questions.length ? 'ส่งคำตอบ' : 'ถัดไป →'}
+          </button>
+        </div>
+      </div>
+    </div>
     </>
   )
 }
