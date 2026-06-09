@@ -115,8 +115,7 @@ export default function HomePage() {
         .cta-band-inner{max-width:540px;margin:0 auto}
         .cta-band h2{font-size:clamp(24px,3.5vw,36px);font-weight:700;color:#fff;letter-spacing:-1px;margin-bottom:12px}
         .cta-band p{font-size:15px;color:#9CA3AF;line-height:1.7;margin-bottom:32px}
-        .btn-white{display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--ink);font-size:14px;font-weight:700;padding:14px 28px;border-radius:10px;text-decoration:none;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:transform .15s,box-shadow .15s}
-        .btn-white:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.32)}
+
 
         footer{border-top:1px solid var(--border);padding:20px 28px}
         .footer-inner{max-width:1120px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
@@ -245,13 +244,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="cta-band">
-        <div className="cta-band-inner">
-          <h2>เริ่มได้เลย ฟรี ไม่มีเงื่อนไข</h2>
-          <p>ไม่ต้องสมัครสมาชิก ไม่ต้องใส่บัตรเครดิต ใช้เวลาแค่ 5 นาทีก็รู้ผลแล้ว</p>
-          <Link href="/archetype" className="btn-white">ค้นหา Data Archetype ของฉัน →</Link>
-        </div>
-      </div>
+
 
       <footer>
         <div className="footer-inner">
