@@ -2,211 +2,229 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { archetypeQuestions, type ArchetypeKey } from '@/lib/archetypeQuestions'
+import Link from 'next/link'
 
-const ARCHETYPE_COLORS: Record<ArchetypeKey, string> = {
-  detective: '#F59E0B',
-  architect: '#3B82F6',
-  storyteller: '#EC4899',
-  engineer: '#10B981',
-  scientist: '#8B5CF6',
-  strategist: '#EF4444',
+const ANIMALS: Record<string, string> = {
+  detective:  'https://d8j0ntlcm91z4.cloudfront.net/user_3Et6nR8Yefq3LxvEYXJM7qntcjL/hf_20260609_062721_92e91c71-dd7e-43f7-9a31-04e9cc758262.png',
+  architect:  'https://d8j0ntlcm91z4.cloudfront.net/user_3Et6nR8Yefq3LxvEYXJM7qntcjL/hf_20260609_062916_9567f017-65c7-48fe-b2cc-eecc8ac12df4.png',
+  storyteller:'https://d8j0ntlcm91z4.cloudfront.net/user_3Et6nR8Yefq3LxvEYXJM7qntcjL/hf_20260609_063125_03a654e2-0f0b-4cac-9375-e0ebb94485f9.png',
+  engineer:   'https://d8j0ntlcm91z4.cloudfront.net/user_3Et6nR8Yefq3LxvEYXJM7qntcjL/hf_20260609_063512_e28707fd-c89e-4a41-b508-6b3c6dac8a53.png',
+  scientist:  'https://d8j0ntlcm91z4.cloudfront.net/user_3Et6nR8Yefq3LxvEYXJM7qntcjL/hf_20260609_063739_ecf2a873-eec1-42cc-bfbc-50256ffa3527.png',
+  strategist: 'https://d8j0ntlcm91z4.cloudfront.net/user_3Et6nR8Yefq3LxvEYXJM7qntcjL/hf_20260609_063822_56fec52c-976a-45c8-be73-88acc72e0713.png',
 }
+
+const ANIMAL_POS: Record<string, string> = {
+  detective: 'center 8%', architect: 'center 8%', storyteller: 'center 8%',
+  engineer: 'center 8%', scientist: '65% 8%', strategist: 'center 8%',
+}
+
+const ACCENT: Record<string, string> = {
+  detective: '#F59E0B', architect: '#2563EB', storyteller: '#EC4899',
+  engineer: '#10B981', scientist: '#8B5CF6', strategist: '#EF4444',
+}
+
+const CARDS = [
+  { key:'detective',  name:'นักสืบข้อมูล',      role:'The Detective'  },
+  { key:'architect',  name:'นักออกแบบระบบ',     role:'The Architect'  },
+  { key:'storyteller',name:'นักเล่าเรื่อง',      role:'The Storyteller'},
+  { key:'engineer',   name:'นักสร้างระบบ',      role:'The Engineer'   },
+  { key:'scientist',  name:'นักทดสอบสมมติฐาน', role:'The Scientist'  },
+  { key:'strategist', name:'นักกลยุทธ์',        role:'The Strategist' },
+]
+
+const CSS = `
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#111318;--ink2:#3D4451;--ink3:#6B7280;--ink4:#9CA3AF;--blue:#2563EB;--blue-lt:#DBEAFE;--warm:#FAFAF8;--white:#FFFFFF;--border:#E5E7EB;--border2:#F3F4F6}
+html{font-family:'Inter',-apple-system,sans-serif;background:var(--white);color:var(--ink);-webkit-font-smoothing:antialiased}
+.nav{position:sticky;top:0;z-index:200;height:58px;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center}
+.nav-inner{width:100%;max-width:1120px;margin:0 auto;padding:0 28px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:16px;font-weight:800;color:var(--ink);text-decoration:none;letter-spacing:-0.4px}
+.logo-dot{color:var(--blue)}
+.back-link{font-size:13px;color:var(--ink3);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .15s}
+.back-link:hover{color:var(--ink)}
+
+.intro-wrap{max-width:640px;margin:0 auto;padding:72px 24px 56px;text-align:center}
+.intro-eyebrow{font-size:11px;font-weight:600;color:var(--blue);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+.intro-h1{font-size:clamp(28px,5vw,44px);font-weight:800;color:var(--ink);letter-spacing:-1.2px;line-height:1.1;margin-bottom:16px}
+.intro-sub{font-size:16px;color:var(--ink3);line-height:1.75;margin-bottom:40px}
+.btn-start{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;font-size:15px;font-weight:600;padding:14px 32px;border-radius:10px;text-decoration:none;border:none;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.18),0 4px 12px rgba(0,0,0,.1);transition:transform .15s,box-shadow .15s}
+.btn-start:hover{transform:translateY(-2px);box-shadow:0 2px 6px rgba(0,0,0,.2),0 8px 24px rgba(0,0,0,.12)}
+.intro-note{font-size:12px;color:var(--ink4);margin-top:12px}
+
+.animal-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;max-width:720px;margin:0 auto 48px}
+.animal-card{border:1px solid var(--border);border-radius:14px;padding:16px 8px 12px;text-align:center;background:var(--white);transition:border-color .18s,box-shadow .18s,transform .18s;cursor:default}
+.animal-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.animal-img-wrap{width:56px;height:56px;border-radius:50%;overflow:hidden;background:var(--warm);margin:0 auto 8px}
+.animal-img-wrap img{width:100%;height:110%;object-fit:cover;mix-blend-mode:multiply}
+.animal-role{font-size:9px;font-weight:600;color:var(--blue);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.animal-name{font-size:12px;font-weight:600;color:var(--ink)}
+
+.quiz-outer{min-height:calc(100vh - 58px);background:var(--warm);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.progress-bar-wrap{width:100%;max-width:600px;margin-bottom:20px}
+.progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.progress-back{background:none;border:none;font-size:13px;color:var(--ink4);cursor:pointer;display:flex;align-items:center;gap:5px;transition:color .15s;padding:0}
+.progress-back:hover{color:var(--ink3)}
+.progress-count{font-size:13px;font-weight:600;color:var(--ink3)}
+.progress-count em{font-style:normal;font-size:15px;font-weight:800}
+.progress-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .4s ease,background .6s ease}
+
+.quiz-card{width:100%;max-width:600px;background:var(--white);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.quiz-q{padding:32px 28px 24px;font-size:18px;font-weight:700;color:var(--ink);line-height:1.65;text-align:center}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;padding:0 20px 24px}
+.opt-btn{width:100%;text-align:left;background:var(--warm);border:1.5px solid var(--border);border-radius:12px;padding:15px 18px;font-size:15px;color:var(--ink2);font-family:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s,background .15s;display:flex;align-items:center;gap:12px;line-height:1.5}
+.opt-btn:hover{transform:translateX(4px);box-shadow:0 4px 16px rgba(0,0,0,.07);border-color:#94A3B8;background:var(--white)}
+.opt-btn.selected{background:var(--white);box-shadow:0 4px 16px rgba(0,0,0,.07);transform:translateX(4px)}
+.opt-key{width:28px;height:28px;border-radius:7px;background:var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ink4);flex-shrink:0;transition:background .15s,color .15s}
+.opt-btn.selected .opt-key{color:#fff}
+
+.quiz-footer{background:var(--warm);padding:14px 20px;display:flex;justify-content:flex-end;border-top:1px solid var(--border2)}
+.btn-next{border:none;border-radius:10px;padding:11px 28px;font-size:14px;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s;font-family:inherit}
+.btn-next:enabled:hover{transform:translateY(-2px)}
+.btn-next:disabled{opacity:.4;cursor:default}
+
+@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.q-anim{animation:slideIn .25s ease both}
+
+@media(max-width:540px){
+  .animal-grid{grid-template-columns:repeat(3,1fr)}
+  .quiz-q{font-size:16px;padding:24px 20px 16px}
+  .quiz-opts{padding:0 14px 18px}
+}
+`
 
 export default function ArchetypePage() {
   const router = useRouter()
   const [started, setStarted] = useState(false)
   const [current, setCurrent] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
-  const [scores, setScores] = useState<Record<ArchetypeKey, number>>({
-    detective: 0, architect: 0, storyteller: 0,
-    engineer: 0, scientist: 0, strategist: 0,
-  })
+  const [scores, setScores] = useState<Record<ArchetypeKey, number>>({ detective:0, architect:0, storyteller:0, engineer:0, scientist:0, strategist:0 })
   const [history, setHistory] = useState<{ scores: Record<ArchetypeKey, number> }[]>([])
   const [animating, setAnimating] = useState(false)
 
   const q = archetypeQuestions[current]
-  const progress = (current / archetypeQuestions.length) * 100
-  const isLast = current === archetypeQuestions.length - 1
+  const total = archetypeQuestions.length
+  const progress = (current / total) * 100
+  const isLast = current === total - 1
+  const topKey = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0] as ArchetypeKey
+  const accent = ACCENT[topKey]
 
-  const topArchetype = Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0] as ArchetypeKey
-  const accentColor = ARCHETYPE_COLORS[topArchetype]
-
-  const progressLabels = [
-    'ไม่มีผิดไม่มีถูก เลือกตามความรู้สึกเลย',
-    'กำลังจับ pattern ของคุณอยู่...',
-    'เริ่มชัดเจนขึ้นแล้ว',
-    'ครึ่งทางแล้ว!',
-    'ใกล้รู้แล้ว อีกนิดเดียว',
-    'เกือบถึงแล้ว!',
-  ]
-  const labelIdx = Math.min(Math.floor((current / archetypeQuestions.length) * progressLabels.length), progressLabels.length - 1)
+  const pColor = current / total < 0.4 ? '#EF4444' : current / total < 0.7 ? '#F59E0B' : '#10B981'
 
   const handleSelect = (i: number) => {
     if (animating) return
     setSelected(i)
     setAnimating(true)
     const newScores = { ...scores }
-    const opt = q.options[i]
-    Object.entries(opt.scores).forEach(([k, v]) => { newScores[k as ArchetypeKey] += v })
+    Object.entries(q.options[i].scores).forEach(([k,v]) => { newScores[k as ArchetypeKey] += v })
     setHistory(h => [...h, { scores: { ...scores } }])
     setScores(newScores)
     setTimeout(() => {
       if (isLast) {
-        const result = Object.entries(newScores).sort((a, b) => b[1] - a[1])[0][0] as ArchetypeKey
+        const result = Object.entries(newScores).sort((a,b) => b[1]-a[1])[0][0]
         router.push('/archetype/result?type=' + result)
       } else {
-        setCurrent(c => c + 1)
-        setSelected(null)
-        setAnimating(false)
+        setCurrent(c => c+1); setSelected(null); setAnimating(false)
       }
-    }, 380)
+    }, 350)
   }
 
   const handleBack = () => {
     if (current === 0) { setStarted(false); return }
-    const prev = history[history.length - 1]
-    setScores(prev.scores)
-    setHistory(h => h.slice(0, -1))
-    setCurrent(c => c - 1)
-    setSelected(null)
-    setAnimating(false)
+    const prev = history[history.length-1]
+    setScores(prev.scores); setHistory(h => h.slice(0,-1))
+    setCurrent(c => c-1); setSelected(null); setAnimating(false)
   }
+
+  const Navbar = () => (
+    <nav className="nav">
+      <div className="nav-inner">
+        <Link href="/" className="logo">ZUME<span className="logo-dot">.</span>Datalab</Link>
+        {started
+          ? <button className="back-link" onClick={handleBack} style={{background:'none',border:'none',cursor:'pointer'}}>← ย้อนกลับ</button>
+          : <Link href="/" className="back-link">← หน้าแรก</Link>
+        }
+      </div>
+    </nav>
+  )
 
   if (!started) return (
     <>
-      <style>{`
-        * { box-sizing:border-box; margin:0; padding:0; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        @keyframes pulse { 0%,100%{box-shadow:0 4px 20px rgba(79,70,229,0.3)} 50%{box-shadow:0 8px 32px rgba(79,70,229,0.55)} }
-        .f1{animation:fadeUp 0.5s ease both}
-        .f2{animation:fadeUp 0.5s 0.1s ease both}
-        .f3{animation:fadeUp 0.5s 0.2s ease both}
-        .f4{animation:fadeUp 0.5s 0.3s ease both}
-        .arch-mini { border-radius:16px; padding:18px 10px; text-align:center; animation:float ease-in-out infinite; transition:transform 0.2s,box-shadow 0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
-        .arch-mini:hover { transform:translateY(-8px) !important; box-shadow:0 16px 32px rgba(0,0,0,0.12); animation:none; }
-        .start-btn { width:100%; background:#4F46E5; color:#fff; border:none; border-radius:16px; padding:18px; font-size:18px; font-weight:700; cursor:pointer; animation:pulse 2.5s ease infinite; transition:transform 0.18s; }
-        .start-btn:hover { transform:translateY(-3px); animation:none; box-shadow:0 12px 32px rgba(79,70,229,0.45); }
-        .back-link { color:#bbb; font-size:14px; text-decoration:none; transition:color 0.15s; }
-        .back-link:hover { color:#555; }
-        @media(max-width:540px) { .arch-intro-grid { grid-template-columns:repeat(3,1fr) !important; } }
-      `}</style>
-      <main style={{ minHeight:'100vh', background:'#fff', fontFamily:'system-ui,sans-serif', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'2rem 1.5rem' }}>
-        <div style={{ width:'100%', maxWidth:520 }}>
-          <a href="/" className="back-link" style={{ display:'inline-block', marginBottom:32 }}>← กลับหน้าแรก</a>
-          <div className="f1" style={{ fontSize:12, fontWeight:700, color:'#4F46E5', letterSpacing:1.5, textTransform:'uppercase', marginBottom:14 }}>Data Archetype</div>
-          <h1 className="f2" style={{ fontSize:'clamp(1.9rem,5vw,2.6rem)', fontWeight:800, color:'#111', lineHeight:1.2, marginBottom:14, letterSpacing:'-0.3px' }}>
-            คุณเป็น Data<br />สายไหนกันนะ?
-          </h1>
-          <p className="f3" style={{ fontSize:17, color:'#666', lineHeight:1.8, marginBottom:36 }}>
-            15 คำถามสั้นๆ ไม่มีผิดไม่มีถูก<br />กดคำตอบที่เป็นตัวคุณที่สุดได้เลย
-          </p>
-          <div className="f3 arch-intro-grid" style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:10, marginBottom:36 }}>
-            {[
-              { emoji:'🦊', name:'นักสืบ', bg:'#FEF9EE', border:'#F59E0B', delay:'0s' },
-              { emoji:'🦅', name:'นักออกแบบ', bg:'#EFF6FF', border:'#3B82F6', delay:'0.4s' },
-              { emoji:'🦋', name:'นักเล่าเรื่อง', bg:'#FDF2F8', border:'#EC4899', delay:'0.8s' },
-              { emoji:'🦫', name:'นักสร้าง', bg:'#F0FDF4', border:'#10B981', delay:'1.2s' },
-              { emoji:'🦉', name:'นักทดสอบ', bg:'#F5F3FF', border:'#8B5CF6', delay:'1.6s' },
-              { emoji:'🐆', name:'นักกลยุทธ์', bg:'#FFF1F2', border:'#EF4444', delay:'2s' },
-            ].map((a) => (
-              <div key={a.name} className="arch-mini" style={{ background:a.bg, border:`1px solid ${a.border}33`, animationDuration:'3.5s', animationDelay:a.delay }}>
-                <div style={{ fontSize:26, marginBottom:6 }}>{a.emoji}</div>
-                <div style={{ fontSize:11, color:'#444', fontWeight:600, lineHeight:1.3 }}>{a.name}</div>
+      <style>{CSS}</style>
+      <Navbar />
+      <div style={{ background:'var(--white)', minHeight:'calc(100vh - 58px)' }}>
+        <div className="intro-wrap">
+          <div className="intro-eyebrow">Data Archetype Quiz</div>
+          <h1 className="intro-h1">คุณเป็น Data<br />สายไหนกันนะ?</h1>
+          <p className="intro-sub">15 คำถามสั้นๆ ไม่มีผิดไม่มีถูก<br />กดคำตอบที่เป็นตัวคุณที่สุดได้เลย</p>
+
+          <div className="animal-grid">
+            {CARDS.map(c => (
+              <div key={c.key} className="animal-card" style={{ borderColor: `${ACCENT[c.key]}33` }}>
+                <div className="animal-img-wrap">
+                  <img src={ANIMALS[c.key]} alt={c.name} style={{ objectPosition: ANIMAL_POS[c.key] }} />
+                </div>
+                <div className="animal-role">{c.role}</div>
+                <div className="animal-name">{c.name}</div>
               </div>
             ))}
           </div>
-          <button className="f4 start-btn" onClick={() => setStarted(true)}>เริ่มเลย →</button>
-          <p style={{ fontSize:13, color:'#bbb', textAlign:'center', marginTop:14 }}>ใช้เวลาแค่ 3 นาที · ฟรี</p>
+
+          <button className="btn-start" onClick={() => setStarted(true)}>เริ่มเลย →</button>
+          <p className="intro-note">ใช้เวลาแค่ 3 นาที · ฟรี</p>
         </div>
-      </main>
+      </div>
     </>
   )
 
   return (
     <>
-      <style>{`
-        * { box-sizing:border-box; margin:0; padding:0; }
-        @keyframes slideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes fadeOpt { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
-        .q-wrap { animation:slideIn 0.3s ease both; }
-        .opt-btn {
-          width:100%; text-align:left; cursor:pointer; border-radius:14px;
-          padding:16px 18px; display:flex; align-items:center; gap:13px;
-          transition:transform 0.15s, box-shadow 0.15s, border-color 0.15s, background 0.15s;
-          -webkit-tap-highlight-color:transparent;
-          animation:fadeOpt 0.2s ease both;
-        }
-        .opt-btn:hover { transform:translateX(4px); box-shadow:0 4px 16px rgba(0,0,0,0.08); }
-        .back-btn { background:none; border:none; font-size:14px; color:#bbb; cursor:pointer; padding:0; display:flex; align-items:center; gap:6px; transition:color 0.15s; }
-        .back-btn:hover { color:#555; }
-        .next-btn { border:none; border-radius:12px; padding:12px 28px; font-size:15px; font-weight:700; cursor:pointer; transition:transform 0.15s, box-shadow 0.15s; }
-        .next-btn:hover { transform:translateY(-2px); }
-        @media(max-width:480px) { .q-text{font-size:17px !important} .quiz-pad{padding:1.5rem 1.25rem !important} }
-      `}</style>
-
-      <main style={{ minHeight:'100vh', background:'#FAFAFA', fontFamily:'system-ui,sans-serif', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'1rem 1.25rem' }}>
-
-        <div style={{ width:'100%', maxWidth:560, marginBottom:'1.25rem' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
-            <button className="back-btn" onClick={handleBack}>← ย้อนกลับ</button>
-            <div style={{ fontSize:14, color:'#94A3B8', fontWeight:600 }}>
-              <span style={{ color: accentColor, fontSize:16, fontWeight:800 }}>{current + 1}</span>
-              <span style={{ color:'#CBD5E1' }}> / {archetypeQuestions.length}</span>
+      <style>{CSS}</style>
+      <Navbar />
+      <div className="quiz-outer">
+        <div className="progress-bar-wrap">
+          <div className="progress-top">
+            <button className="progress-back" onClick={handleBack}>← ย้อนกลับ</button>
+            <div className="progress-count">
+              <em style={{ color: accent }}>{current+1}</em> / {total}
             </div>
           </div>
-
-          {/* Progress bar — เปลี่ยนสีตาม top archetype */}
-          <div style={{ height:7, background:'#E5E7EB', borderRadius:4, overflow:'hidden' }}>
-            <div style={{ height:'100%', width:`${progress}%`, background:accentColor, borderRadius:4, transition:'width 0.4s ease, background 0.6s ease', boxShadow:`0 0 8px ${accentColor}66` }} />
-          </div>
-          <div style={{ fontSize:13, color:'#C4C9D4', marginTop:8, textAlign:'center' }}>{progressLabels[labelIdx]}</div>
-        </div>
-
-        <div className="q-wrap" style={{ width:'100%', maxWidth:560, background:'#fff', borderRadius:22, boxShadow:'0 4px 32px rgba(0,0,0,0.08)', overflow:'hidden' }}>
-          <div className="quiz-pad" style={{ padding:'2rem 1.75rem' }}>
-            <div className="q-text" style={{ fontSize:20, fontWeight:700, color:'#111', lineHeight:1.6, textAlign:'center', marginBottom:'1.75rem' }}>
-              {q.scenario}
-            </div>
-
-            <div style={{ display:'flex', flexDirection:'column', gap:11 }}>
-              {q.options.map((opt, i) => {
-                const isSel = selected === i
-                return (
-                  <button
-                    key={i}
-                    className="opt-btn"
-                    onClick={() => handleSelect(i)}
-                    style={{
-                      border: isSel ? `2px solid ${accentColor}` : '1.5px solid #E5E7EB',
-                      background: isSel ? `${accentColor}12` : '#FAFAFA',
-                      boxShadow: isSel ? `0 2px 16px ${accentColor}25` : 'none',
-                      animationDelay: `${i * 0.05}s`,
-                    }}
-                  >
-                    <div style={{ width:32, height:32, borderRadius:10, flexShrink:0, background: isSel ? accentColor : '#fff', border: isSel ? 'none' : '1.5px solid #E5E7EB', display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, fontWeight:700, color: isSel ? '#fff' : '#94A3B8' }}>
-                      {['A','B','C','D'][i]}
-                    </div>
-                    <div style={{ fontSize:16, color: isSel ? '#111' : '#374151', lineHeight:1.5, fontWeight: isSel ? 600 : 400 }}>
-                      {opt.text}
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          <div style={{ padding:'0.5rem 1.75rem 1rem', background:'#F8FAFC', display:'flex', justifyContent:'center' }}>
-            <div style={{ display:'flex', gap:4 }}>
-              {archetypeQuestions.map((_, i) => (
-                <div key={i} style={{ width: i === current ? 16 : 6, height:6, borderRadius:3, background: i < current ? accentColor : i === current ? accentColor : '#E2E8F0', transition:'all 0.3s ease', opacity: i < current ? 0.5 : 1 }} />
-              ))}
-            </div>
+          <div className="progress-track">
+            <div className="progress-fill" style={{ width:`${progress}%`, background: pColor }} />
           </div>
         </div>
 
-        <div style={{ marginTop:'1.5rem', fontSize:12, color:'#ddd' }}>© 2026 ZUME Datalab</div>
-      </main>
+        <div className="quiz-card q-anim" key={current}>
+          <div className="quiz-q">{q.scenario}</div>
+          <div className="quiz-opts">
+            {q.options.map((opt, i) => {
+              const keys = ['A','B','C','D']
+              const isSel = selected === i
+              return (
+                <button
+                  key={i}
+                  className={`opt-btn${isSel ? ' selected' : ''}`}
+                  onClick={() => handleSelect(i)}
+                  style={isSel ? { borderColor: accent } : {}}
+                >
+                  <span className="opt-key" style={isSel ? { background: accent } : {}}>{keys[i]}</span>
+                  {opt.text}
+                </button>
+              )
+            })}
+          </div>
+          <div className="quiz-footer">
+            <button
+              className="btn-next"
+              disabled={selected === null}
+              onClick={() => selected !== null && handleSelect(selected)}
+              style={{ background: selected !== null ? accent : '#E5E7EB', color: selected !== null ? '#fff' : '#94A3B8' }}
+            >
+              {isLast ? 'ดูผลลัพธ์ →' : 'ต่อไป →'}
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   )
 }
